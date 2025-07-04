@@ -1,25 +1,34 @@
-document.getElementById('fixture-form').addEventListener('submit', async function(e) {
-  e.preventDefault();
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('fixture-form');
 
-  const homeName = document.getElementById('homeName').value;
-  const awayName = document.getElementById('awayName').value;
-  const homeGSP = parseInt(document.getElementById('homeGSP').value);
-  const awayGSP = parseInt(document.getElementById('awayGSP').value);
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
 
-  const { error } = await supabase.from('fixtures').insert([
-    {
-      home_name: homeName,
-      away_name: awayName,
-      home_gsp: homeGSP,
-      away_gsp: awayGSP,
+    const homeName = document.getElementById('homeName').value.trim();
+    const awayName = document.getElementById('awayName').value.trim();
+    const homeGSP = parseInt(document.getElementById('homeGSP').value);
+    const awayGSP = parseInt(document.getElementById('awayGSP').value);
+
+    if (!homeName || !awayName || isNaN(homeGSP) || isNaN(awayGSP)) {
+      alert('Please fill in all fields correctly.');
+      return;
     }
-  ]);
 
-  if (error) {
-    alert('Error saving fixture.');
-    console.error(error);
-  } else {
-    alert('Fixture saved!');
-    document.getElementById('fixture-form').reset();
-  }
+    const { error } = await supabase.from('fixtures').insert([
+      {
+        home_name: homeName,
+        away_name: awayName,
+        home_gsp: homeGSP,
+        away_gsp: awayGSP
+      }
+    ]);
+
+    if (error) {
+      console.error('Supabase insert error:', error);
+      alert('Something went wrong while saving.');
+    } else {
+      alert('Fixture saved successfully!');
+      form.reset();
+    }
+  });
 });
