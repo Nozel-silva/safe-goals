@@ -1,17 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SafeGoals - Fixtures</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="supabaseClient.js" defer></script>
+  <style>
+    .typewriter {
+      overflow: hidden;
+      border-right: .15em solid #aaffaa;
+      white-space: nowrap;
+      margin: 0 auto 2rem auto;
+      letter-spacing: .15em;
+      animation: typing 4s steps(30, end), blink-caret 0.75s step-end infinite;
+      max-width: 90%;
+      font-size: 1.2rem;
+    }
+
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+
+    @keyframes blink-caret {
+      from, to { border-color: transparent }
+      50% { border-color: #aaffaa; }
+    }
+
+    footer {
+      margin-top: 2rem;
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    section {
+      margin-bottom: 2rem;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
+    <div class="typewriter">Know who scores using SafeGoals</div>
+
     <h1>SafeGoals Fixtures</h1>
+
+    <section>
+      <p><strong>What is SafeGoals?</strong></p>
+      <p>SafeGoals is a tool that helps you track, compare, and predict game scores. Whether you're a data analyst, sports fan, or just curious — SafeGoals gives you a quick overview of home vs away performances.</p>
+    </section>
+
+    <section>
+      <p><strong>How to Use:</strong></p>
+      <ul style="text-align: left; max-width: 500px; margin: 0 auto;">
+        <li>Visit the <a href="index.html" style="color: #aaffaa;">form page</a> to submit match data.</li>
+        <li>Return here to view all submissions in real time, sorted by latest.</li>
+        <li>Use this to understand team patterns, GSPs, and more.</li>
+      </ul>
+    </section>
+
     <div id="fixture-list"></div>
+
+    <footer>Powered by LeadingEdge</footer>
   </div>
 
   <script>
