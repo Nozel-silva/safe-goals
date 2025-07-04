@@ -1,0 +1,54 @@
+body {
+  background-color: #000;
+  color: #aaffaa;
+  font-family: 'Orbitron', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  padding: 2rem;
+  text-align: center;
+}
+
+h1 {
+  color: #aaffaa;
+  margin-bottom: 1.5rem;
+}
+
+input, button {
+  display: block;
+  margin: 1rem auto;
+  padding: 0.7rem;
+  width: 80%;
+  max-width: 300px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+button {
+  background-color: #aaffaa;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.fixture-box {
+  border: 1px solid #aaffaa;
+  padding: 1rem;
+  margin: 1rem auto;
+  max-width: 400px;
+  border-radius: 10px;
+  background: rgba(170, 255, 170, 0.1);
+}
+
+.fixture-names {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.fixture-scores {
+  color: white;
+  margin-top: 0.5rem;
+}
