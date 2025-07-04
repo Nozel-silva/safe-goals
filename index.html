@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeGoals - Fixtures</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="supabaseClient.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <h1>SafeGoals Fixtures</h1>
+    <div id="fixture-list"></div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const { data, error } = await supabase
+        .from('fixtures')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      const fixtureList = document.getElementById('fixture-list');
+
+      if (error) {
+        fixtureList.innerHTML = '<p>Error loading fixtures.</p>';
+        return;
+      }
+
+      fixtureList.innerHTML = data.map(f => `
+        <div class="fixture-box">
+          <div class="fixture-names">${f.home_name} vs ${f.away_name}</div>
+          <div class="fixture-scores">${f.home_gsp} - ${f.away_gsp}</div>
+        </div>
+      `).join('');
+    });
+  </script>
+</body>
+</html>
