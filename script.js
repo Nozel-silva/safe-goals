@@ -1,4 +1,5 @@
-console.log("script.js loaded ✅"); // Confirm the file loads
+console.log("script.js loaded ✅");
+alert("Script is running!");// Confirm the file loads
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log("DOM fully loaded ✅");
