@@ -1,5 +1,13 @@
 console.log("script.js loaded ✅");
 alert("Script is running!");// Confirm the file loads
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('fixture-form');
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    alert("🚀 Submit button clicked!"); // <-- this confirms the button is connected
+  });
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log("DOM fully loaded ✅");
