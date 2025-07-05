@@ -7,6 +7,38 @@
   <link rel="stylesheet" href="styles.css"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="supabaseClient.js" defer></script>
+  <style>
+    .typewriter {
+      overflow: hidden;
+      border-right: .15em solid #aaffaa;
+      white-space: nowrap;
+      margin: 0 auto 2rem auto;
+      letter-spacing: .15em;
+      animation: typing 4s steps(30, end), blink-caret 0.75s step-end infinite;
+      max-width: 90%;
+      font-size: 1.2rem;
+    }
+
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+
+    @keyframes blink-caret {
+      from, to { border-color: transparent }
+      50% { border-color: #aaffaa; }
+    }
+
+    footer {
+      margin-top: 2rem;
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    section {
+      margin-bottom: 2rem;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -21,10 +53,12 @@
 
     <section>
       <p><strong>How to Use:</strong></p>
-      <ul>
-        <li>Visit booking sites e.g <a href="https://www.sportybet.com/ng/m/" style="color: #aaffaa;">sportybet</a> to select home or away goal markets</li>
+      <ul style="text-align: left; max-width: 500px; margin: 0 auto;">
+        <li>Visit any booking sites e.g <a href="https://www.sportybet.com/ng/m/" style="color: #aaffaa;">sportybet</a> to select home or away goal markets amongst the top 5 leagues</li>
         <li>Return here to view the GSP for each selected game in real time.</li>
-        <li>Use SafeGoals to filter out weak games and make better picks.</li>
+        <li>Use SafeGoals to filter out which game looks bad and get to go</li>
+<h4>or</h4>
+<li> make your selections using SafeGoals while simultaneously picking the favoured market</li>
       </ul>
     </section>
 
@@ -35,11 +69,6 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
-      if (typeof supabase === 'undefined') {
-        alert('❌ Supabase not loaded.');
-        return;
-      }
-
       const { data, error } = await supabase
         .from('fixtures')
         .select('*')
