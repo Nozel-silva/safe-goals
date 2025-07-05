@@ -11,7 +11,11 @@
 </head>
 <body>
   <script>
-  console.log('Supabase is:', typeof supabase !== 'undefined' ? 'Loaded ✅' : 'NOT Loaded ❌');
+  if (typeof supabase === 'undefined') {
+    alert("❌ Supabase not loaded.");
+  } else {
+    alert("✅ Supabase loaded!");
+  }
   </script>
   <div class="container">
     <h1>Welcome to SafeGoals</h1>
