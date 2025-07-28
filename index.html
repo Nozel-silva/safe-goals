@@ -4,10 +4,29 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SafeGoals - Fixtures</title>
-  <link rel="stylesheet" href="styles.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script src="supabaseClient.js" defer></script>
+
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Orbitron', sans-serif;
+    }
+
+    body {
+      background-color: #000;
+      color: #aaffaa;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
     .typewriter {
       overflow: hidden;
       border-right: .15em solid #aaffaa;
@@ -15,7 +34,7 @@
       margin: 0 auto 2rem auto;
       letter-spacing: .15em;
       animation: typing 4s steps(30, end), blink-caret 0.75s step-end infinite;
-      max-width: 90%;
+      max-width: 100%;
       font-size: 1.2rem;
     }
 
@@ -29,55 +48,75 @@
       50% { border-color: #aaffaa; }
     }
 
-    footer {
-      margin-top: 2rem;
-      color: #666;
-      font-size: 0.9rem;
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      text-shadow: 0 0 5px #aaffaa, 0 0 10px #44ff44;
     }
 
     section {
       margin-bottom: 2rem;
+      text-align: left;
+    }
+
+    ul {
+      padding-left: 20px;
+      list-style-type: square;
+    }
+
+    a {
+      color: #aaffaa;
+    }
+
+    .fixture-box {
+      background-color: #111;
+      border: 1px solid #aaffaa;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      box-shadow: 0 0 8px #222;
+    }
+
+    .fixture-names {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .fixture-scores {
+      font-size: 1rem;
+      color: #88ff88;
+    }
+
+    footer {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: #666;
     }
   </style>
-</head>
-<body>
-  <div class="container">
-    <div class="typewriter">Know who scores using SafeGoals</div>
-
-    <h1>SafeGoals Fixtures</h1>
-
-    <section>
-      <p><strong>What is SafeGoals?</strong></p>
-      <p>SafeGoals is a tool that helps you track, compare, and predict game scores. Whether you're a data analyst, sports fan, or just curious — SafeGoals gives you a quick overview of home vs away performances.</p>
-    </section>
-
-    <section>
-      <p><strong>How to Use:</strong></p>
-      <ul style="text-align: left; max-width: 500px; margin: 0 auto;">
-        <li>Visit any booking sites e.g <a href="https://www.sportybet.com/ng/m/" style="color: #aaffaa;">sportybet</a> to select home or away goal markets amongst the top 5 leagues</li>
-        <li>Return here to view the GSP for each selected game in real time.</li>
-        <li>Use SafeGoals to filter out which game looks bad and get to go</li>
-<h4>or</h4>
-<li> make your selections using SafeGoals while simultaneously picking the favoured market</li>
-      </ul>
-    </section>
-
-    <div id="fixture-list"></div>
-
-    <footer>Powered by LeadingEdge</footer>
-  </div>
 
   <script>
+    // ✅ Supabase credentials
+    const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
     document.addEventListener('DOMContentLoaded', async () => {
+      const fixtureList = document.getElementById('fixture-list');
+
       const { data, error } = await supabase
         .from('fixtures')
         .select('*')
         .order('created_at', { ascending: false });
 
-      const fixtureList = document.getElementById('fixture-list');
-
       if (error) {
-        fixtureList.innerHTML = '<p>Error loading fixtures.</p>';
+        fixtureList.innerHTML = '<p>❌ Error loading fixtures.</p>';
+        console.error(error);
+        return;
+      }
+
+      if (!data || data.length === 0) {
+        fixtureList.innerHTML = '<p>No fixtures found.</p>';
         return;
       }
 
@@ -89,5 +128,30 @@
       `).join('');
     });
   </script>
+</head>
+<body>
+  <div class="container">
+    <div class="typewriter">Know who scores using SafeGoals</div>
+    <h1>SafeGoals Fixtures</h1>
+
+    <section>
+      <p><strong>What is SafeGoals?</strong></p>
+      <p>SafeGoals is a tool that helps you track, compare, and predict game scores. Whether you're a data analyst, sports fan, or just curious — SafeGoals gives you a quick overview of home vs away performances.</p>
+    </section>
+
+    <section>
+      <p><strong>How to Use:</strong></p>
+      <ul>
+        <li>Visit any betting site like <a href="https://www.sportybet.com/ng/m/" target="_blank">SportyBet</a></li>
+        <li>Check Home or Away Goal markets among top 5 leagues.</li>
+        <li>Return here and use GSP scores to guide your picks.</li>
+        <li>You can filter games with weak goal-scoring patterns.</li>
+      </ul>
+    </section>
+
+    <div id="fixture-list"></div>
+
+    <footer>Powered by LeadingEdge</footer>
+  </div>
 </body>
 </html>
