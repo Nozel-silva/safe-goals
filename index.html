@@ -7,30 +7,27 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <style>
     body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #0f0f0f;
+      background: #0f0f0f;
       color: #aaffaa;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 1rem;
       text-align: center;
-      padding: 2rem;
     }
 
     h1 {
       font-size: 2rem;
-      margin-bottom: 1rem;
-      animation: fadeIn 2s ease-in-out;
+      margin-bottom: 0.5rem;
     }
 
     .typewriter {
       overflow: hidden;
       border-right: .15em solid #aaffaa;
       white-space: nowrap;
-      margin: 0 auto 2rem auto;
+      margin: 0 auto 1rem;
       letter-spacing: .15em;
       animation: typing 4s steps(30, end), blink-caret 0.75s step-end infinite;
-      max-width: 90%;
-      font-size: 1.2rem;
-      color: #aaffaa;
+      max-width: 100%;
+      font-size: 1.1rem;
     }
 
     @keyframes typing {
@@ -45,52 +42,57 @@
 
     .fixture-box {
       border: 1px solid #333;
-      background-color: #1a1a1a;
-      border-radius: 12px;
+      border-radius: 10px;
+      background: #1a1a1a;
       padding: 1rem;
       margin: 1rem auto;
       max-width: 350px;
-      box-shadow: 0 0 10px rgba(0, 255, 127, 0.3);
-      transition: transform 0.2s;
-    }
-
-    .fixture-box:hover {
-      transform: scale(1.02);
     }
 
     .fixture-names {
-      font-size: 1.2rem;
-      margin-bottom: 0.3rem;
       font-weight: bold;
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
     }
 
     .fixture-scores {
-      font-size: 1rem;
       display: flex;
       justify-content: space-around;
-      color: #ffffff;
-    }
-
-    .fixture-scores div {
-      width: 50%;
+      font-size: 1rem;
     }
 
     footer {
       margin-top: 2rem;
-      color: #666;
       font-size: 0.9rem;
+      color: #666;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0 }
-      to { opacity: 1 }
+    section {
+      max-width: 500px;
+      margin: 1rem auto;
+      text-align: left;
     }
   </style>
 </head>
 <body>
 
   <div class="typewriter">Know who scores using SafeGoals</div>
+
   <h1>SafeGoals Fixtures</h1>
+
+  <section>
+    <p><strong>What is SafeGoals?</strong></p>
+    <p>SafeGoals helps you track, compare, and predict game scores. Whether you're a sports analyst, bettor, or football fan — use SafeGoals to make smarter picks.</p>
+  </section>
+
+  <section>
+    <p><strong>How to Use:</strong></p>
+    <ul>
+      <li>Visit sites like <a href="https://www.sportybet.com/ng/m/" style="color: #aaffaa;">SportyBet</a></li>
+      <li>Check GSP for each fixture here</li>
+      <li>Pick the best value with low risk</li>
+    </ul>
+  </section>
 
   <div id="fixture-list">Loading fixtures...</div>
 
