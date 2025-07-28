@@ -5,47 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SafeGoals - Submit Fixture</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <script>
-    // This will run without needing any extra file
+<script>
+  let supabase;
+
+  window.addEventListener('load', () => {
     const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    document.addEventListener('DOMContentLoaded', () => {
-      const form = document.getElementById('fixture-form');
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      form.addEventListener('submit', async function (e) {
-        e.preventDefault();
+    const form = document.getElementById('fixture-form');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-        const homeName = document.getElementById('homeName').value.trim();
-        const awayName = document.getElementById('awayName').value.trim();
-        const homeGSP = parseInt(document.getElementById('homeGSP').value);
-        const awayGSP = parseInt(document.getElementById('awayGSP').value);
+      const homeName = document.getElementById('homeName').value.trim();
+      const awayName = document.getElementById('awayName').value.trim();
+      const homeGSP = parseInt(document.getElementById('homeGSP').value);
+      const awayGSP = parseInt(document.getElementById('awayGSP').value);
 
-        if (!homeName || !awayName || isNaN(homeGSP) || isNaN(awayGSP)) {
-          alert('Please fill in all fields.');
-          return;
-        }
+      if (!homeName || !awayName || isNaN(homeGSP) || isNaN(awayGSP)) {
+        alert('Please fill in all fields.');
+        return;
+      }
 
-        const { data, error } = await supabase.from('fixtures').insert([
-          {
-            home_name: homeName,
-            away_name: awayName,
-            home_gsp: homeGSP,
-            away_gsp: awayGSP
-          }
-        ]);
+      const { data, error } = await supabase.from('fixtures').insert([
+        { home_name: homeName, away_name: awayName, home_gsp: homeGSP, away_gsp: awayGSP }
+      ]);
 
-        if (error) {
-          console.error('Insert error:', error);
-          alert('❌ Failed to save: ' + error.message);
-        } else {
-          alert('✅ Fixture saved!');
-          form.reset();
-        }
-      });
+      if (error) {
+        console.error('Insert error:', error);
+        alert('❌ Failed to save: ' + error.message);
+      } else {
+        alert('✅ Fixture saved!');
+        form.reset();
+      }
     });
-  </script>
+  });
+                                               </script>
+  
 </head>
 <body>
   <h1>SafeGoals Upload</h1>
