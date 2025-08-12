@@ -1,133 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SafeGoals - Fixtures</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-  <style>
-    body {
-      background: #0f0f0f;
-      color: #aaffaa;
-      font-family: 'Segoe UI', sans-serif;
-      padding: 1rem;
-      text-align: center;
-    }
-
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .typewriter {
-      overflow: hidden;
-      border-right: .15em solid #aaffaa;
-      white-space: nowrap;
-      margin: 0 auto 1rem;
-      letter-spacing: .15em;
-      animation: typing 4s steps(30, end), blink-caret 0.75s step-end infinite;
-      max-width: 100%;
-      font-size: 1.1rem;
-    }
-
-    @keyframes typing {
-      from { width: 0 }
-      to { width: 100% }
-    }
-
-    @keyframes blink-caret {
-      from, to { border-color: transparent }
-      50% { border-color: #aaffaa; }
-    }
-
-    .fixture-box {
-      border: 1px solid #333;
-      border-radius: 10px;
-      background: #1a1a1a;
-      padding: 1rem;
-      margin: 1rem auto;
-      max-width: 350px;
-    }
-
-    .fixture-names {
-      font-weight: bold;
-      font-size: 1.2rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .fixture-scores {
-      display: flex;
-      justify-content: space-around;
-      font-size: 1rem;
-    }
-
-    footer {
-      margin-top: 2rem;
-      font-size: 0.9rem;
-      color: #666;
-    }
-
-    section {
-      max-width: 500px;
-      margin: 1rem auto;
-      text-align: left;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Data Display</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input, textarea, select, button {
+            margin-top: 5px;
+            padding: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="typewriter">Know who scores using SafeGoals</div>
+    <h2>Submit Form</h2>
 
-  <h1>SafeGoals Fixtures</h1>
+    <form id="myForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
 
-  <section>
-    <p><strong>What is SafeGoals?</strong></p>
-    <p>SafeGoals helps you track, compare, and predict game scores. Whether you're a sports analyst, bettor, or football fan — use SafeGoals to make smarter picks.</p>
-  </section>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
 
-  <section>
-    <p><strong>How to Use:</strong></p>
-    <ul>
-      <li>Visit sites like <a href="https://www.sportybet.com/ng/m/" style="color: #aaffaa;">SportyBet</a></li>
-      <li>Check GSP for each fixture here</li>
-      <li>Pick the best value with low risk</li>
-    </ul>
-  </section>
+        <label for="message">Message:</label>
+        <textarea id="message" name="message" required></textarea>
 
-  <div id="fixture-list">Loading fixtures...</div>
+        <button type="submit">Submit</button>
+    </form>
 
-  <footer>Powered by LeadingEdge</footer>
+    <div id="output" style="display: none;">
+        <h3>Form Data Submitted:</h3>
+        <p><strong>Name:</strong> <span id="displayName"></span></p>
+        <p><strong>Email:</strong> <span id="displayEmail"></span></p>
+        <p><strong>Message:</strong> <span id="displayMessage"></span></p>
+    </div>
 
-  <script>
-    const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
+    <script>
+        document.getElementById("myForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Stop page refresh
 
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            // Get form values
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const message = document.getElementById("message").value;
 
-    document.addEventListener('DOMContentLoaded', async () => {
-      const fixtureList = document.getElementById('fixture-list');
+            // Display values
+            document.getElementById("displayName").innerText = name;
+            document.getElementById("displayEmail").innerText = email;
+            document.getElementById("displayMessage").innerText = message;
 
-      const { data, error } = await supabase
-        .from('fixtures')
-        .select('*')
-        .order('created_at', { ascending: false });
+            // Show output div
+            document.getElementById("output").style.display = "block";
 
-      if (error || !data || data.length === 0) {
-        fixtureList.innerHTML = '<p>No fixtures found or error loading data.</p>';
-        console.error(error);
-        return;
-      }
+            // Optionally clear form
+            this.reset();
+        });
+    </script>
 
-      fixtureList.innerHTML = data.map(f => `
-        <div class="fixture-box">
-          <div class="fixture-names">${f.home_name} vs ${f.away_name}</div>
-          <div class="fixture-scores">
-            <div>${f.home_gsp}</div>
-            <div>${f.away_gsp}</div>
-          </div>
-        </div>
-      `).join('');
-    });
-  </script>
 </body>
 </html>
