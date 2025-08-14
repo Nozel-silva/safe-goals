@@ -60,6 +60,12 @@
       display: flex;
       justify-content: space-around;
       font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .uploaded-time {
+      font-size: 0.8rem;
+      color: #aaa;
     }
 
     footer {
@@ -103,7 +109,6 @@
     const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
 
-    // Use a different variable name to avoid overwriting
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     document.addEventListener('DOMContentLoaded', async () => {
@@ -120,15 +125,19 @@
         return;
       }
 
-      fixtureList.innerHTML = data.map(f => `
-        <div class="fixture-box">
-          <div class="fixture-names">${f.home_name} vs ${f.away_name}</div>
-          <div class="fixture-scores">
-            <div>${f.home_gsp}</div>
-            <div>${f.away_gsp}</div>
+      fixtureList.innerHTML = data.map(f => {
+        const uploadedAt = new Date(f.created_at).toLocaleString(); // Format date & time
+        return `
+          <div class="fixture-box">
+            <div class="fixture-names">${f.home_name} vs ${f.away_name}</div>
+            <div class="fixture-scores">
+              <div>${f.home_gsp}</div>
+              <div>${f.away_gsp}</div>
+            </div>
+            <div class="uploaded-time">Uploaded at: ${uploadedAt}</div>
           </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     });
   </script>
 </body>
