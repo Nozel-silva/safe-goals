@@ -4,111 +4,173 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SafeGoals - Fixtures</title>
-  <!-- Correct Supabase CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
   <style>
+    :root {
+      --bg-dark: #0f0f0f;
+      --card-bg: #1a1a1a;
+      --accent: #00ff99;
+      --text-light: #f5f5f5;
+      --text-muted: #aaa;
+    }
+
     body {
-      background: #0f0f0f;
-      color: #aaffaa;
+      background: var(--bg-dark);
+      color: var(--text-light);
       font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: linear-gradient(90deg, #003366, #001a33);
+      padding: 1rem 2rem;
+      text-align: center;
+      animation: fadeDown 0.8s ease-out;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      margin: 0;
+      font-weight: bold;
+    }
+
+    header p {
+      font-size: 1rem;
+      color: var(--text-muted);
+    }
+
+    main {
+      max-width: 1200px;
+      margin: auto;
+      padding: 1rem;
+    }
+
+    /* Info Cards */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .info-card {
+      background: var(--card-bg);
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .info-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+    }
+
+    .info-card h3 {
+      color: var(--accent);
+      margin-top: 0;
+    }
+
+    /* Fixture Cards */
+    .fixtures-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+
+    .fixture-card {
+      background: var(--card-bg);
+      border-radius: 12px;
       padding: 1rem;
       text-align: center;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
 
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .typewriter {
-      overflow: hidden;
-      border-right: .15em solid #aaffaa;
-      white-space: nowrap;
-      margin: 0 auto 1rem;
-      letter-spacing: .15em;
-      animation: typing 4s steps(30, end), blink-caret 0.75s step-end infinite;
-      max-width: 100%;
-      font-size: 1.1rem;
-    }
-
-    @keyframes typing {
-      from { width: 0 }
-      to { width: 100% }
-    }
-
-    @keyframes blink-caret {
-      from, to { border-color: transparent }
-      50% { border-color: #aaffaa; }
-    }
-
-    .fixture-box {
-      border: 1px solid #333;
-      border-radius: 10px;
-      background: #1a1a1a;
-      padding: 1rem;
-      margin: 1rem auto;
-      max-width: 350px;
+    .fixture-card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.5);
     }
 
     .fixture-names {
+      font-size: 1.1rem;
       font-weight: bold;
-      font-size: 1.2rem;
       margin-bottom: 0.5rem;
     }
 
     .fixture-scores {
       display: flex;
-      justify-content: space-around;
-      font-size: 1rem;
+      justify-content: center;
+      gap: 1rem;
+      font-size: 1.2rem;
+      color: var(--accent);
       margin-bottom: 0.5rem;
     }
 
     .uploaded-time {
       font-size: 0.8rem;
-      color: #aaa;
+      color: var(--text-muted);
     }
 
     footer {
-      margin-top: 2rem;
+      text-align: center;
+      padding: 1rem;
       font-size: 0.9rem;
-      color: #666;
+      background: #111;
+      color: var(--text-muted);
+      margin-top: 2rem;
     }
 
-    section {
-      max-width: 500px;
-      margin: 1rem auto;
-      text-align: left;
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    @keyframes fadeDown {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
   </style>
 </head>
 <body>
+  <header>
+    <h1>SafeGoals</h1>
+    <p>Know who scores — smarter predictions, less guesswork</p>
+  </header>
 
-  <div class="typewriter">Know who scores using SafeGoals</div>
+  <main>
+    <!-- Info Cards -->
+    <div class="info-grid">
+      <div class="info-card">
+        <h3>About SafeGoals</h3>
+        <p>SafeGoals predicts match outcomes using our advanced GSP algorithm. Ideal for football fans, analysts, and bettors.</p>
+      </div>
+      <div class="info-card">
+        <h3>When It Works</h3>
+        <p>The algorithm only activates after <strong>five gameweeks</strong> for maximum accuracy.</p>
+      </div>
+      <div class="info-card">
+        <h3>What's New?</h3>
+        <p>Better than ever — improved accuracy, faster updates, and cleaner data.</p>
+      </div>
+      <div class="info-card">
+        <h3>Free Samples</h3>
+        <p>Follow our <a href="https://twitter.com/Nuel_sama" target="_blank" style="color:var(--accent)">Twitter (X)</a> for free predictions and tips weekly.</p>
+      </div>
+    </div>
 
-  <h1>SafeGoals Fixtures</h1>
+    <!-- Fixtures -->
+    <h2>Latest Fixtures</h2>
+    <div id="fixture-list" class="fixtures-grid">Loading fixtures...</div>
+  </main>
 
-  <section>
-    <p><strong>What is SafeGoals?</strong></p>
-    <p>SafeGoals helps you track, compare, and predict game scores. Whether you're a sports analyst, bettor, or football fan — use SafeGoals to make smarter picks.</p>
-  </section>
-
-  <section>
-    <p><strong>How to Use:</strong></p>
-    <ul>
-      <li>Visit sites like <a href="https://www.sportybet.com/ng/m/" style="color: #aaffaa;">SportyBet</a></li>
-      <li>Check GSP for each fixture here</li>
-      <li>Pick the best value with low risk</li>
-    </ul>
-  </section>
-
-  <div id="fixture-list">Loading fixtures...</div>
-
-  <footer>Powered by LeadingEdge</footer>
+  <footer>
+    Powered by <a href="#">LeadingEdge</a>
+  </footer>
 
   <script>
     const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
-
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     document.addEventListener('DOMContentLoaded', async () => {
@@ -126,19 +188,20 @@
       }
 
       fixtureList.innerHTML = data.map(f => {
-        const uploadedAt = new Date(f.created_at).toLocaleString(); // Format date & time
+        const uploadedAt = new Date(f.created_at).toLocaleString();
         return `
-          <div class="fixture-box">
+          <div class="fixture-card">
             <div class="fixture-names">${f.home_name} vs ${f.away_name}</div>
             <div class="fixture-scores">
-              <div>${f.home_gsp}</div>
-              <div>${f.away_gsp}</div>
+              <span>${f.home_gsp}</span>
+              <span>${f.away_gsp}</span>
             </div>
-            <div class="uploaded-time">Uploaded at: ${uploadedAt}</div>
+            <div class="uploaded-time">Uploaded: ${uploadedAt}</div>
           </div>
         `;
       }).join('');
     });
   </script>
 </body>
-</html>
+  </html>
+          
