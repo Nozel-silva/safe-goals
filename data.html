@@ -66,11 +66,51 @@
   <div id="fixture-list" class="fixtures-grid">Loading fixtures...</div>
 
   <script>
+    // ✅ Supabase setup
     const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // ✅ Subscription check
+    async function checkSubscription() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+
+      if (!user) {
+        alert("You must log in first.");
+        window.location.href = "login.html";
+        return null;
+      }
+
+      let { data, error } = await supabaseClient
+        .from("subscriptions")
+        .select("status, expiry_date")
+        .eq("user_id", user.id)
+        .single();
+
+      if (error || !data) {
+        alert("No subscription found. Please subscribe.");
+        window.location.href = "subscribe.html"; // your paystack page
+        return null;
+      }
+
+      const today = new Date();
+      const expiry = new Date(data.expiry_date);
+
+      if (data.status === "active" && expiry >= today) {
+        console.log("✅ Subscription valid.");
+        return user;
+      } else {
+        alert("⛔ Subscription expired. Please renew.");
+        window.location.href = "subscribe.html"; // your paystack page
+        return null;
+      }
+    }
+
+    // ✅ Load fixtures after subscription check
     document.addEventListener('DOMContentLoaded', async () => {
+      const user = await checkSubscription();
+      if (!user) return; // stop if no valid subscription
+
       const fixtureList = document.getElementById('fixture-list');
 
       const { data, error } = await supabaseClient
