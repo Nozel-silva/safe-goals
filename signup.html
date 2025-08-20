@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      background-color: lightgreen;
+      color: black;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      width: 300px;
+      text-align: center;
+    }
+    input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: black;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #333;
+    }
+    #message {
+      margin-top: 10px;
+      font-size: 14px;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Create Account</h2>
+    <form id="signup-form">
+      <input type="text" id="username" placeholder="Username" required><br>
+      <input type="email" id="email" placeholder="Email" required><br>
+      <input type="password" id="password" placeholder="Password" required><br>
+      <button type="submit">Sign Up</button>
+    </form>
+    <div id="message"></div>
+  </div>
+
+  <script>
+    // Replace with your Supabase project credentials
+    const SUPABASE_URL = "https://YOUR-PROJECT-ID.supabase.co";
+    const SUPABASE_KEY = "YOUR-ANON-KEY";
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const signupForm = document.getElementById("signup-form");
+    const messageEl = document.getElementById("message");
+
+    signupForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      // ✅ Check if username/email exists
+      const { data: existingUser, error: checkError } = await supabase
+        .from("profiles")
+        .select("*")
+        .or(`username.eq.${username}, email.eq.${email}`)
+        .maybeSingle();
+
+      if (existingUser) {
+        messageEl.textContent = "Username or email already taken.";
+        return;
+      }
+
+      // ✅ Create new user (with email verification)
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { username }
+        }
+      });
+
+      if (error) {
+        messageEl.textContent = error.message;
+      } else {
+        messageEl.style.color = "green";
+        messageEl.textContent = "Check your email for a verification link!";
+      }
+    });
+  </script>
+</body>
+</html>
