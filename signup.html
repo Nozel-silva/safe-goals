@@ -61,10 +61,11 @@
 
   <script>
     // Initialize Supabase
-    const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co"; // replace with your Supabase project URL
-    const SUPABASE_ANON_KEY = "YOUR_ANON_KEY"; // replace with your anon key
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
 
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
     const form = document.getElementById("signup-form");
     const message = document.getElementById("message");
 
