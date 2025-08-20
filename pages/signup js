@@ -1,0 +1,142 @@
+// pages/signup.js
+import { useState } from "react";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
+
+export default function Signup() {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+
+    // 1. Check if username or email already exists in profiles
+    const { data: existing, error: checkError } = await supabase
+      .from("profiles")
+      .select("*")
+      .or(`username.eq.${username},email.eq.${email}`);
+
+    if (checkError) {
+      setMessage("Error checking existing users.");
+      return;
+    }
+    if (existing.length > 0) {
+      setMessage("Username or Email already exists!");
+      return;
+    }
+
+    // 2. Sign up with Supabase Auth (triggers email verification)
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password: Math.random().toString(36).slice(-8), // temporary password
+      options: {
+        emailRedirectTo: "http://localhost:3000/welcome", // change to your deployed URL
+      },
+    });
+
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+
+    // 3. Insert into profiles table
+    const { error: insertError } = await supabase.from("profiles").insert([
+      {
+        username,
+        email,
+      },
+    ]);
+
+    if (insertError) {
+      setMessage("Error saving profile.");
+    } else {
+      setMessage("Signup successful! Please check your email to verify.");
+      setUsername("");
+      setEmail("");
+    }
+  };
+
+  return (
+    <div className="container">
+      <h1>Signup Page</h1>
+      <form className="signup-form" onSubmit={handleSignup}>
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+        />
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <button type="submit">Sign Up</button>
+      </form>
+
+      {message && <p className="msg">{message}</p>}
+
+      <style jsx>{`
+        .container {
+          background-color: lightgreen;
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          color: black;
+          font-family: Arial, sans-serif;
+        }
+
+        h1 {
+          margin-bottom: 20px;
+        }
+
+        .signup-form {
+          background: white;
+          padding: 20px;
+          border-radius: 10px;
+          box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+          width: 300px;
+          max-width: 90%;
+        }
+
+        input {
+          padding: 10px;
+          border: 1px solid black;
+          border-radius: 5px;
+        }
+
+        button {
+          background: black;
+          color: white;
+          padding: 10px;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          font-weight: bold;
+        }
+
+        button:hover {
+          background: #222;
+        }
+
+        .msg {
+          margin-top: 15px;
+          font-weight: bold;
+        }
+      `}</style>
+    </div>
+  );
+}
