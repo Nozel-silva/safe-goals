@@ -2,107 +2,118 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sign Up</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabaseClient.js"></script>
   <style>
     body {
-      background-color: lightgreen;
-      color: black;
       font-family: Arial, sans-serif;
+      background: #f0fff0;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
     }
-    .container {
-      background: white;
-      padding: 2rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      width: 300px;
+    .signup-box {
+      background: #000;
+      color: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      width: 320px;
       text-align: center;
     }
     input {
       width: 90%;
       padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+      margin: 8px 0;
+      border-radius: 8px;
+      border: none;
     }
     button {
-      width: 100%;
       padding: 10px;
-      background: black;
-      color: white;
+      width: 100%;
+      background: lightgreen;
       border: none;
-      border-radius: 5px;
+      color: black;
+      font-weight: bold;
+      border-radius: 8px;
       cursor: pointer;
     }
     button:hover {
-      background: #333;
+      opacity: 0.8;
     }
     #message {
-      margin-top: 10px;
+      margin-top: 12px;
       font-size: 14px;
-      color: red;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>Create Account</h2>
+  <div class="signup-box">
+    <h2>Sign Up</h2>
     <form id="signup-form">
-      <input type="text" id="username" placeholder="Username" required><br>
-      <input type="email" id="email" placeholder="Email" required><br>
-      <input type="password" id="password" placeholder="Password" required><br>
+      <input type="text" id="username" placeholder="Username" required /><br>
+      <input type="email" id="email" placeholder="Email" required /><br>
+      <input type="password" id="password" placeholder="Password" required /><br>
       <button type="submit">Sign Up</button>
     </form>
-    <div id="message"></div>
+    <p id="message"></p>
   </div>
 
   <script>
-    // Replace with your Supabase project credentials
-    
+    // Initialize Supabase
+    const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co"; // replace with your Supabase project URL
+    const SUPABASE_ANON_KEY = "YOUR_ANON_KEY"; // replace with your anon key
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const signupForm = document.getElementById("signup-form");
-    const messageEl = document.getElementById("message");
+    const form = document.getElementById("signup-form");
+    const message = document.getElementById("message");
 
-    signupForm.addEventListener("submit", async (e) => {
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const username = document.getElementById("username").value.trim();
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
 
-      // ✅ Check if username/email exists
-      const { data: existingUser, error: checkError } = await supabase
+      // Check if email or username already exists
+      const { data: existingUsers, error: checkError } = await supabase
         .from("profiles")
         .select("*")
-        .or(`username.eq.${username}, email.eq.${email}`)
-        .maybeSingle();
+        .or(`email.eq.${email},username.eq.${username}`);
 
-      if (existingUser) {
-        messageEl.textContent = "Username or email already taken.";
+      if (checkError) {
+        message.textContent = "Error checking existing users.";
         return;
       }
 
-      // ✅ Create new user (with email verification)
+      if (existingUsers.length > 0) {
+        alert("User with this email or username already exists!");
+        return;
+      }
+
+      // Sign up user with Supabase Auth (this sends verification email)
       const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { username }
-        }
+        email: email,
+        password: password
       });
 
       if (error) {
-        messageEl.textContent = error.message;
-      } else {
-        messageEl.style.color = "green";
-        messageEl.textContent = "Check your email for a verification link!";
+        message.textContent = "Signup failed: " + error.message;
+        return;
       }
+
+      // Insert into profiles table
+      const { error: insertError } = await supabase.from("profiles").insert([
+        { username: username, email: email, password: password }
+      ]);
+
+      if (insertError) {
+        message.textContent = "Error saving profile: " + insertError.message;
+        return;
+      }
+
+      // Success message
+      message.textContent = "Almost there! Check your email for verification link.";
     });
   </script>
 </body>
