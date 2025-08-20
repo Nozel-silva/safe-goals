@@ -1,121 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Sign Up</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0fff0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .signup-box {
-      background: #000;
-      color: #fff;
-      padding: 30px;
-      border-radius: 12px;
-      width: 320px;
-      text-align: center;
-    }
-    input {
-      width: 90%;
-      padding: 10px;
-      margin: 8px 0;
-      border-radius: 8px;
-      border: none;
-    }
-    button {
-      padding: 10px;
-      width: 100%;
-      background: lightgreen;
-      border: none;
-      color: black;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    button:hover {
-      opacity: 0.8;
-    }
-    #message {
-      margin-top: 12px;
-      font-size: 14px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign Up</title>
+
+<!-- Supabase JS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- bcrypt.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f0fff0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+.signup-box {
+  background: #000;
+  color: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-sizing: border-box;
+}
+input {
+  width: 90%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: none;
+  box-sizing: border-box;
+}
+button {
+  padding: 10px;
+  width: 95%;
+  background: lightgreen;
+  border: none;
+  color: black;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+}
+button:hover { opacity: 0.8; }
+#message { margin-top: 12px; font-size: 14px; color: yellow; }
+</style>
 </head>
 <body>
-  <div class="signup-box">
-    <h2>Sign Up</h2>
-    <form id="signup-form">
-      <input type="text" id="username" placeholder="Username" required /><br>
-      <input type="email" id="email" placeholder="Email" required /><br>
-      <input type="password" id="password" placeholder="Password" required /><br>
-      <button type="submit">Sign Up</button>
-    </form>
-    <p id="message"></p>
-  </div>
 
-  <script>
-    // Initialize Supabase
-    const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
+<div class="signup-box">
+  <h2>Sign Up</h2>
+  <form id="signup-form">
+    <input type="text" id="username" placeholder="Username" required><br>
+    <input type="email" id="email" placeholder="Email" required><br>
+    <input type="password" id="password" placeholder="Password" required><br>
+    <button type="submit">Sign Up</button>
+  </form>
+  <p id="message"></p>
+</div>
 
+<script>
+// Supabase init
+const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co"; // replace
+const SUPABASE_ANON_KEY = "YOUR_ANON_KEY"; // replace
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    
-    const form = document.getElementById("signup-form");
-    const message = document.getElementById("message");
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+const form = document.getElementById("signup-form");
+const message = document.getElementById("message");
 
-      const username = document.getElementById("username").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-      // Check if email or username already exists
-      const { data: existingUsers, error: checkError } = await supabase
-        .from("profiles")
-        .select("*")
-        .or(`email.eq.${email},username.eq.${username}`);
+  const username = document.getElementById("username").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
 
-      if (checkError) {
-        message.textContent = "Error checking existing users.";
-        return;
-      }
+  // Check existing user
+  const { data: existingUsers, error: checkError } = await supabase
+    .from("profiles")
+    .select("*")
+    .or(`username.eq.${username},email.eq.${email}`);
 
-      if (existingUsers.length > 0) {
-        alert("User with this email or username already exists!");
-        return;
-      }
+  if (checkError) { message.textContent = "Error checking users"; return; }
+  if (existingUsers.length > 0) { alert("Username or email already exists"); return; }
 
-      // Sign up user with Supabase Auth (this sends verification email)
-      const { data, error } = await supabase.auth.signUp({
-        email: email,
-        password: password
-      });
+  // Sign up Auth user
+  const { data, error } = await supabase.auth.signUp({ email, password });
+  if (error) { message.textContent = error.message; return; }
 
-      if (error) {
-        message.textContent = "Signup failed: " + error.message;
-        return;
-      }
+  // Hash password using bcrypt.js
+  const salt = bcrypt.genSaltSync(10);
+  const hashedPassword = bcrypt.hashSync(password, salt);
 
-      // Insert into profiles table
-      const { error: insertError } = await supabase.from("profiles").insert([
-        { username: username, email: email, password: password }
-      ]);
+  // Insert into profiles table
+  const { error: insertError } = await supabase.from("profiles").insert([
+    { id: data.user.id, username, email, password: hashedPassword }
+  ]);
+  if (insertError) { message.textContent = "Profile insert error"; return; }
 
-      if (insertError) {
-        message.textContent = "Error saving profile: " + insertError.message;
-        return;
-      }
+  // Success message
+  message.style.color = "lightgreen";
+  message.textContent = "Almost there! Check your email for verification link.";
+});
+</script>
 
-      // Success message
-      message.textContent = "Almost there! Check your email for verification link.";
-    });
-  </script>
 </body>
 </html>
