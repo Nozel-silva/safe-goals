@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeGoals - Smarter Football Predictions</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #37003c;
+      color: white;
+      line-height: 1.6;
+    }
+    header {
+      background: #280029;
+      padding: 20px;
+      text-align: center;
+      animation: fadeDown 1s ease;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      color: lightgreen;
+    }
+    header p {
+      font-size: 1.2rem;
+      color: #ddd;
+    }
+    .container {
+      padding: 30px;
+      max-width: 1000px;
+      margin: auto;
+    }
+    h2 {
+      color: lightgreen;
+      border-bottom: 2px solid #ff2882;
+      display: inline-block;
+      padding-bottom: 5px;
+      margin-top: 40px;
+    }
+    .subscribe {
+      text-align: center;
+      margin: 40px 0;
+      animation: fadeUp 1.5s ease;
+    }
+    .subscribe a{
+        color:gold;
+    }
+    .subscribe button {
+      background: green;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .subscribe button:hover {
+      transform: scale(1.05);
+      background: #ff4c9c;
+    }
+    .results {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 20px;
+      animation: fadeIn 2s ease;
+    }
+    .card {
+      background: #280029;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px rgba(255, 40, 130, 0.3);
+      transition: transform 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .correct {
+      color: #00ff7f;
+      font-weight: bold;
+    }
+    .wrong {
+      color: #ff4444;
+      font-weight: bold;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: #280029;
+      margin-top: 50px;
+      color: #aaa;
+    }
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>SafeGoals</h1>
+    <p>Smarter Football Predictions Backed by Data</p>
+  </header>
+
+  <div class="container">
+    <section>
+      <h2>About SafeGoals</h2>
+      <p>
+        SafeGoals is a cutting-edge football prediction platform built to bring transparency and accuracy 
+        into the betting and sports analysis world. After tracking results for the first 5 gameweeks, 
+        our model adapts to new team dynamics, ensuring predictions remain sharp and relevant all season long. 
+      </p>
+      <p>
+        We focus on what truly matters: goals. By analyzing data patterns, SafeGoals predicts whether games 
+        are likely to produce <strong>Over 0.5</strong> or <strong>Over 1.5 Goals</strong> for Home/Away sides. 
+        Our system is <strong>user-friendly</strong>, reliable, and built for both casual fans and data-driven punters.
+      </p>
+    </section>
+
+    <section>
+      <h2>How It Works</h2>
+      <p>
+        1. We track all matches and generate probabilities for goals.<br>
+        2. Results are verified and displayed in real time.<br>
+        3. Users gain insights into trends, improving decision-making.<br>
+        4. The model evolves week by week, learning from outcomes.<br>
+      </p>
+    </section>
+
+    <section class="subscribe">
+      <h2>Get Started</h2>
+      <p>Join SafeGoals today and see why our predictions stand out. Transparency you can trust.</p>
+      <button>Subscribe Now</button>
+      <p class="mt-2 text-gray-600 italic">
+    Or <a href=" https://x.com/safe_goals">follow</a> us on X to see 5% of analyzed games
+  </p>
+    </section>
+
+    <section>
+      <h2>Recent Results</h2>
+      <div class="results">
+        <div class="card">
+          <h3>Arsenal vs Chelsea</h3>
+          <p>Home Over 0.5: <span class="correct">Correct</span></p>
+          <p>Away Over 1.5: <span class="wrong">Wrong</span></p>
+        </div>
+        <div class="card">
+          <h3>Man City vs Liverpool</h3>
+          <p>Home Over 0.5: <span class="correct">Correct</span></p>
+          <p>Away Over 1.5: <span class="correct">Correct</span></p>
+        </div>
+        <div class="card">
+          <h3>Tottenham vs Newcastle</h3>
+          <p>Home Over 0.5: <span class="wrong">Wrong</span></p>
+          <p>Away Over 1.5: <span class="correct">Correct</span></p>
+        </div>
+        <div class="card">
+          <h3>Everton vs West Ham</h3>
+          <p>Home Over 0.5: <span class="correct">Correct</span></p>
+          <p>Away Over 1.5: <span class="wrong">Wrong</span></p>
+        </div>
+      </div>
+      <p style="margin-top: 20px; text-align: center;">
+        📊 <a href="your-data-link-here" style="color:#ff2882; text-decoration:none;">Click here to view full prediction data</a>
+      </p>
+    </section>
+  </div>
+
+  <footer>
+    &copy; 2025 SafeGoals. All rights reserved.
+  </footer>
+</body>
+  </html>
+  
