@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Users</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background: #2c3e50;
+      color: white;
+    }
+    tr:hover {
+      background: #f1f1f1;
+    }
+  </style>
+</head>
+<body>
+  <h1>Admin Dashboard - Registered Users</h1>
+  <table id="usersTable">
+    <thead>
+      <tr>
+        <th>User ID</th>
+        <th>Email</th>
+        <th>Full Name</th>
+        <th>Role</th>
+        <th>Signup Date</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const SUPABASE_URL = "https://acjpjzdfcxmhvuvwtpjr.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFjanBqemRmY3htaHZ1dnd0cGpyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjM4MzM5MzcsImV4cCI6MjAzOTQwOTkzN30.27q-9fJK3A5J5O38gsCNbrMBbQKswqWcLw_jRoA0W6w";
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    async function loadUsers() {
+      // 1. Get auth.users
+      let { data: users, error: usersError } = await supabase.auth.admin.listUsers();
+      if (usersError) {
+        console.error("Error fetching users:", usersError);
+        return;
+      }
+
+      // 2. Get profiles
+      let { data: profiles, error: profilesError } = await supabase.from("profiles").select("*");
+      if (profilesError) {
+        console.error("Error fetching profiles:", profilesError);
+        return;
+      }
+
+      // 3. Merge data
+      const tableBody = document.querySelector("#usersTable tbody");
+      tableBody.innerHTML = "";
+
+      users.users.forEach(u => {
+        const profile = profiles.find(p => p.id === u.id) || {};
+        const row = `
+          <tr>
+            <td>${u.id}</td>
+            <td>${u.email}</td>
+            <td>${profile.full_name || "-"}</td>
+            <td>${profile.role || "-"}</td>
+            <td>${new Date(u.created_at).toLocaleString()}</td>
+          </tr>
+        `;
+        tableBody.innerHTML += row;
+      });
+    }
+
+    loadUsers();
+  </script>
+</body>
+</html>
