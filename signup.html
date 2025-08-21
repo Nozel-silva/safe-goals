@@ -7,8 +7,6 @@
 
 <!-- Supabase JS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- bcrypt.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bcryptjs/2.4.3/bcrypt.min.js"></script>
 
 <style>
 body {
@@ -70,8 +68,10 @@ button:hover { opacity: 0.8; }
 // Supabase init
 const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  
+
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
 const form = document.getElementById("signup-form");
 const message = document.getElementById("message");
 
@@ -82,32 +82,48 @@ form.addEventListener("submit", async (e) => {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
 
-  // Check existing user
-  const { data: existingUsers, error: checkError } = await supabase
-    .from("profiles")
-    .select("*")
-    .or(`username.eq.${username},email.eq.${email}`);
+  message.style.color = "yellow";
+  message.textContent = "Processing...";
 
-  if (checkError) { message.textContent = "Error checking users"; return; }
-  if (existingUsers.length > 0) { alert("Username or email already exists"); return; }
+  try {
+    // Check if username or email already exists
+    const { data: existingUsers, error: checkError } = await db
+      .from("profiles")
+      .select("id")
+      .or(`username.eq.${username},email.eq.${email}`);
 
-  // Sign up Auth user
-  const { data, error } = await supabase.auth.signUp({ email, password });
-  if (error) { message.textContent = error.message; return; }
+    if (checkError) {
+      message.textContent = "Error checking users: " + checkError.message;
+      return;
+    }
+    if (existingUsers.length > 0) {
+      message.textContent = "Username or email already exists.";
+      return;
+    }
 
-  // Hash password using bcrypt.js
-  const salt = bcrypt.genSaltSync(10);
-  const hashedPassword = bcrypt.hashSync(password, salt);
+    // Sign up user
+    const { data, error } = await db.auth.signUp({ email, password });
+    if (error) {
+      message.textContent = error.message;
+      return;
+    }
 
-  // Insert into profiles table
-  const { error: insertError } = await supabase.from("profiles").insert([
-    { id: data.user.id, username, email, password: hashedPassword }
-  ]);
-  if (insertError) { message.textContent = "Profile insert error"; return; }
+    // Insert into profiles (don’t store password!)
+    if (data.user) {
+      const { error: insertError } = await db.from("profiles").insert([
+        { id: data.user.id, username, email }
+      ]);
+      if (insertError) {
+        message.textContent = "Profile insert error: " + insertError.message;
+        return;
+      }
+    }
 
-  // Success message
-  message.style.color = "lightgreen";
-  message.textContent = "Almost there! Check your email for verification link.";
+    message.style.color = "lightgreen";
+    message.textContent = "Almost there! Check your email for verification link.";
+  } catch (err) {
+    message.textContent = "Unexpected error: " + err.message;
+  }
 });
 </script>
 
