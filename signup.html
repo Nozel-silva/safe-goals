@@ -5,50 +5,50 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sign Up</title>
 
-<!-- Supabase JS -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Supabase JS (same style as your working file) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f0fff0;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
-.signup-box {
-  background: #000;
-  color: #fff;
-  padding: 20px;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 400px;
-  text-align: center;
-  box-sizing: border-box;
-}
-input {
-  width: 90%;
-  padding: 10px;
-  margin: 8px 0;
-  border-radius: 8px;
-  border: none;
-  box-sizing: border-box;
-}
-button {
-  padding: 10px;
-  width: 95%;
-  background: lightgreen;
-  border: none;
-  color: black;
-  font-weight: bold;
-  border-radius: 8px;
-  cursor: pointer;
-}
-button:hover { opacity: 0.8; }
-#message { margin-top: 12px; font-size: 14px; color: yellow; }
+  body {
+    font-family: Arial, sans-serif;
+    background: #f0fff0;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  .signup-box {
+    background: #000;
+    color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    box-sizing: border-box;
+  }
+  input {
+    width: 90%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 8px;
+    border: none;
+    box-sizing: border-box;
+  }
+  button {
+    padding: 10px;
+    width: 95%;
+    background: lightgreen;
+    border: none;
+    color: black;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  button:hover { opacity: 0.8; }
+  #message { margin-top: 12px; font-size: 14px; color: yellow; }
 </style>
 </head>
 <body>
@@ -65,66 +65,62 @@ button:hover { opacity: 0.8; }
 </div>
 
 <script>
-// Supabase init
-const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
+  let supabase; // will hold the client (same pattern as your fixtures page)
 
-const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  window.addEventListener('load', () => {
+    const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
 
-const form = document.getElementById("signup-form");
-const message = document.getElementById("message");
+    // EXACT same initialization style:
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
+    const form = document.getElementById('signup-form');
+    const message = document.getElementById('message');
 
-  const username = document.getElementById("username").value.trim();
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-  message.style.color = "yellow";
-  message.textContent = "Processing...";
+      const username = document.getElementById('username').value.trim();
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
 
-  try {
-    // Check if username or email already exists
-    const { data: existingUsers, error: checkError } = await db
-      .from("profiles")
-      .select("id")
-      .or(`username.eq.${username},email.eq.${email}`);
-
-    if (checkError) {
-      message.textContent = "Error checking users: " + checkError.message;
-      return;
-    }
-    if (existingUsers.length > 0) {
-      message.textContent = "Username or email already exists.";
-      return;
-    }
-
-    // Sign up user
-    const { data, error } = await db.auth.signUp({ email, password });
-    if (error) {
-      message.textContent = error.message;
-      return;
-    }
-
-    // Insert into profiles (don’t store password!)
-    if (data.user) {
-      const { error: insertError } = await db.from("profiles").insert([
-        { id: data.user.id, username, email }
-      ]);
-      if (insertError) {
-        message.textContent = "Profile insert error: " + insertError.message;
+      if (!username || !email || !password) {
+        alert('❗ Please fill in all fields.');
         return;
       }
-    }
 
-    message.style.color = "lightgreen";
-    message.textContent = "Almost there! Check your email for verification link.";
-  } catch (err) {
-    message.textContent = "Unexpected error: " + err.message;
-  }
-});
+      message.style.color = 'yellow';
+      message.textContent = 'Processing...';
+
+      // 1) Sign up with Auth
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password });
+
+      if (signUpError) {
+        console.error('Auth error:', signUpError);
+        message.textContent = signUpError.message || 'Sign up failed.';
+        return;
+      }
+
+      // signUpData.user should contain the UUID even if email verification is pending
+      const userId = signUpData?.user?.id;
+
+      // 2) Insert profile row using SAME INSERT PATTERN as your working file
+      //    (no password saved in profiles)
+      const { error: insertError } = await supabase
+        .from('profiles')
+        .insert([{ id: userId, username, email }]); // <— same .from(...).insert([...]) style
+
+      if (insertError) {
+        console.error('Profile insert error:', insertError);
+        message.textContent = 'Profile insert error: ' + insertError.message;
+        return;
+      }
+
+      message.style.color = 'lightgreen';
+      message.textContent = 'Almost there! Check your email for verification link.';
+      form.reset();
+    });
+  });
 </script>
 
 </body>
