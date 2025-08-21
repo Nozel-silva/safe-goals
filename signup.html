@@ -1,127 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sign Up</title>
-
-<!-- Supabase JS (same style as your working file) -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #f0fff0;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-  }
-  .signup-box {
-    background: #000;
-    color: #fff;
-    padding: 20px;
-    border-radius: 12px;
-    width: 90%;
-    max-width: 400px;
-    text-align: center;
-    box-sizing: border-box;
-  }
-  input {
-    width: 90%;
-    padding: 10px;
-    margin: 8px 0;
-    border-radius: 8px;
-    border: none;
-    box-sizing: border-box;
-  }
-  button {
-    padding: 10px;
-    width: 95%;
-    background: lightgreen;
-    border: none;
-    color: black;
-    font-weight: bold;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-  button:hover { opacity: 0.8; }
-  #message { margin-top: 12px; font-size: 14px; color: yellow; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Academia - Sign Up</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+    h2 {
+      margin-bottom: 1rem;
+      color: #333;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 0.5rem 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #4a90e2;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #357abd;
+    }
+    .message {
+      margin-top: 1rem;
+      color: green;
+      font-size: 0.9rem;
+    }
+    .error {
+      margin-top: 1rem;
+      color: red;
+      font-size: 0.9rem;
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <h2>Create an Account</h2>
+    <input type="email" id="email" placeholder="Enter your email" required />
+    <input type="password" id="password" placeholder="Enter your password" required />
+    <button onclick="signUp()">Sign Up</button>
+    <div id="feedback"></div>
+  </div>
 
-<div class="signup-box">
-  <h2>Sign Up</h2>
-  <form id="signup-form">
-    <input type="text" id="username" placeholder="Username" required><br>
-    <input type="email" id="email" placeholder="Email" required><br>
-    <input type="password" id="password" placeholder="Password" required><br>
-    <button type="submit">Sign Up</button>
-  </form>
-  <p id="message"></p>
-</div>
+  <script>
+    // ⬇️ Use your own credentials from the earlier code
+    const SUPABASE_URL = "https://xkglhxxnyovajfvlrluo.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhrZ2xoeHhueW92YWpmdmxybHVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjM4MTc2NjAsImV4cCI6MjAzOTM5MzY2MH0.q4QeIb1hf__6NUpc36rjq3rzzWk6X6d-hFo3YNOFFdA";
 
-<script>
-  let supabase; // will hold the client (same pattern as your fixtures page)
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  window.addEventListener('load', () => {
-    const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
+    async function signUp() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const feedback = document.getElementById("feedback");
 
-    // EXACT same initialization style:
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      feedback.innerHTML = "";
 
-    const form = document.getElementById('signup-form');
-    const message = document.getElementById('message');
+      const { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password
+      });
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const username = document.getElementById('username').value.trim();
-      const email    = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value;
-
-      if (!username || !email || !password) {
-        alert('❗ Please fill in all fields.');
-        return;
+      if (error) {
+        feedback.innerHTML = `<p class="error">${error.message}</p>`;
+      } else {
+        feedback.innerHTML = `<p class="message">✅ Verification email sent to ${email}. Please check your inbox.</p>`;
       }
-
-      message.style.color = 'yellow';
-      message.textContent = 'Processing...';
-
-      // 1) Sign up with Auth
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ email, password });
-
-      if (signUpError) {
-        console.error('Auth error:', signUpError);
-        message.textContent = signUpError.message || 'Sign up failed.';
-        return;
-      }
-
-      // signUpData.user should contain the UUID even if email verification is pending
-      const userId = signUpData?.user?.id;
-
-      // 2) Insert profile row using SAME INSERT PATTERN as your working file
-      //    (no password saved in profiles)
-      const { error: insertError } = await supabase
-        .from('profiles')
-        .insert([{ id: userId, username, email }]); // <— same .from(...).insert([...]) style
-
-      if (insertError) {
-        console.error('Profile insert error:', insertError);
-        message.textContent = 'Profile insert error: ' + insertError.message;
-        return;
-      }
-
-      message.style.color = 'lightgreen';
-      message.textContent = 'Almost there! Check your email for verification link.';
-      form.reset();
-    });
-  });
-</script>
-
+    }
+  </script>
 </body>
 </html>
