@@ -1,114 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Signup Page</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Signup</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #4facfe, #00f2fe);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .container {
-      background: white;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.2);
-      width: 100%;
-      max-width: 350px;
-    }
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #333;
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #4facfe;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover {
-      background: #007acc;
-    }
-    .message {
-      margin-top: 15px;
-      text-align: center;
-      color: green;
-    }
+    body{font-family:Arial,Helvetica,sans-serif;background:#f4f6f9;padding:24px}
+    .card{max-width:520px;margin:24px auto;padding:20px;background:#fff;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
+    input{width:100%;padding:10px;margin:8px 0;border:1px solid #ddd;border-radius:6px}
+    button{padding:10px 14px;border-radius:6px;border:0;background:#2d9cdb;color:#fff;font-weight:600;cursor:pointer}
+    .popup{position:fixed;right:20px;top:20px;padding:12px 16px;background:#28a745;color:#fff;border-radius:8px;display:none}
+    .error{background:#d9534f}
+    .status{margin-top:10px;color:#333}
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <h2>Create Account</h2>
-    <form id="signup-form">
-      <input type="text" id="fullname" placeholder="Full Name" required />
-      <input type="email" id="email" placeholder="Email" required />
-      <input type="password" id="password" placeholder="Password" required />
-      <button type="submit">Sign Up</button>
+  <div class="card">
+    <h2>Create account</h2>
+    <form id="signupForm">
+      <input id="fullName" type="text" placeholder="Full name" required />
+      <input id="email" type="email" placeholder="Email" required />
+      <input id="password" type="password" placeholder="Password" required />
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="submitBtn" type="submit">Sign up</button>
+      </div>
+      <div id="status" class="status"></div>
     </form>
-    <div class="message" id="message"></div>
   </div>
 
+  <div id="popup" class="popup">Verification email sent — check your inbox</div>
+
   <script>
-    // Replace with your Supabase project details
-const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    
+    // --- Your Supabase project (keys you provided)
+    const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
 
-    document.getElementById("signup-form").addEventListener("submit", async (e) => {
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const form = document.getElementById('signupForm');
+    const popup = document.getElementById('popup');
+    const statusEl = document.getElementById('status');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function showPopup(msg, isError = false) {
+      popup.textContent = msg;
+      popup.classList.toggle('error', !!isError);
+      popup.style.display = 'block';
+      setTimeout(() => popup.style.display = 'none', 3000);
+    }
+
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
-      const fullname = document.getElementById("fullname").value;
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      const msgBox = document.getElementById("message");
+      submitBtn.disabled = true;
+      statusEl.textContent = '';
 
-      // Step 1: Sign up user
-      const { data, error } = await supabase.auth.signUp({ email, password });
+      const full_name = document.getElementById('fullName').value.trim();
+      const email = document.getElementById('email').value.trim().toLowerCase();
+      const password = document.getElementById('password').value;
 
-      if (error) {
-        msgBox.style.color = "red";
-        msgBox.textContent = "Signup failed: " + error.message;
+      // 1) Check if email exists in users table
+      const { data: existing, error: checkErr } = await supabase
+        .from('users')
+        .select('id')
+        .ilike('email', email)
+        .limit(1);
+
+      if (checkErr) {
+        statusEl.textContent = 'Error checking email: ' + checkErr.message;
+        submitBtn.disabled = false;
+        return;
+      }
+      if (existing && existing.length > 0) {
+        statusEl.textContent = 'Email already registered.';
+        submitBtn.disabled = false;
         return;
       }
 
-      const user = data.user;
+      // 2) Insert into users table
+      const { data: inserted, error: insertErr } = await supabase
+        .from('users')
+        .insert([{ full_name, email }])
+        .select()
+        .single();
 
-      // Step 2: Insert into profiles table
-      const { error: profileError } = await supabase.from("profiles").insert([
-        { id: user.id, full_name: fullname }
-      ]);
-
-      if (profileError) {
-        msgBox.style.color = "red";
-        msgBox.textContent = "Profile insert error: " + profileError.message;
+      if (insertErr) {
+        statusEl.textContent = 'Could not save user: ' + insertErr.message;
+        submitBtn.disabled = false;
         return;
       }
 
-      msgBox.style.color = "green";
-      msgBox.textContent = "Success! Check your email for verification.";
-      e.target.reset();
+      // 3) Trigger Supabase Auth signup (sends verification mail)
+      const { data: authData, error: authErr } = await supabase.auth.signUp({
+        email,
+        password
+      });
+
+      if (authErr) {
+        // rollback inserted row if auth failed
+        await supabase.from('users').delete().eq('id', inserted.id);
+        statusEl.textContent = 'Signup failed: ' + authErr.message;
+        submitBtn.disabled = false;
+        return;
+      }
+
+      // 4) Success
+      showPopup('Verification email sent to ' + email);
+      statusEl.textContent = 'Verification email sent. Check your inbox.';
+      form.reset();
+      submitBtn.disabled = false;
     });
   </script>
 </body>
