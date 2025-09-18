@@ -12,8 +12,6 @@
       --accent: #00ff99;
       --text-light: #f5f5f5;
       --text-muted: #aaa;
-      --winner: #00ff99; /* green */
-      --loser: #ff3b3b; /* red */
     }
 
     body {
@@ -54,39 +52,13 @@
       justify-content: center;
       gap: 1rem;
       font-size: 1.2rem;
+      color: var(--accent);
       margin-bottom: 0.5rem;
     }
 
     .uploaded-time {
       font-size: 0.8rem;
       color: var(--text-muted);
-      margin-top: 0.5rem;
-    }
-
-    /* Circle chart */
-    .circle {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      background: conic-gradient(
-        var(--winner) 0deg, 
-        var(--winner) var(--winner-angle), 
-        var(--loser) var(--winner-angle), 
-        var(--loser) 360deg
-      );
-      margin: 0.5rem auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.8rem;
-      color: #000;
-      font-weight: bold;
-    }
-
-    .circle span {
-      background: rgba(255,255,255,0.8);
-      padding: 0.2rem 0.4rem;
-      border-radius: 6px;
     }
   </style>
 </head>
@@ -114,37 +86,12 @@
 
       fixtureList.innerHTML = data.map(f => {
         const uploadedAt = new Date(f.created_at).toLocaleString();
-
-        const home = Number(f.home_gsp) || 0;
-        const away = Number(f.away_gsp) || 0;
-        const total = home + away || 1;
-
-        // Find larger side
-        const homeIsWinner = home >= away;
-        const winnerColor = homeIsWinner ? 'var(--winner)' : 'var(--loser)';
-        const loserColor = homeIsWinner ? 'var(--loser)' : 'var(--winner)';
-        const winnerValue = Math.max(home, away);
-        const angle = (winnerValue / total) * 360;
-
-        // Build circle style
-        const circleStyle = `
-          background: conic-gradient(
-            ${winnerColor} 0deg,
-            ${winnerColor} ${angle}deg,
-            ${loserColor} ${angle}deg,
-            ${loserColor} 360deg
-          );
-        `;
-
         return `
           <div class="fixture-card">
             <div class="fixture-names">${f.home_name} vs ${f.away_name}</div>
             <div class="fixture-scores">
-              <span>${home}</span>
-              <span>${away}</span>
-            </div>
-            <div class="circle" style="${circleStyle}">
-              <span>${homeIsWinner ? f.home_name : f.away_name}</span>
+              <span>${f.home_gsp}</span>
+              <span>${f.away_gsp}</span>
             </div>
             <div class="uploaded-time">Uploaded: ${uploadedAt}</div>
           </div>
