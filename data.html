@@ -4,164 +4,136 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SafeGoals - Fixtures</title>
+  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f8f9fa;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    header {
+      background: #111;
+      color: white;
       text-align: center;
-      margin: 20px;
-      animation: fadeInDown 1.5s ease-in-out;
+      padding: 20px;
     }
 
-    @keyframes fadeInDown {
-      0% { opacity: 0; transform: translateY(-30px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-
-    .fixture-container {
+    .container {
       display: flex;
-      justify-content: space-around;
-      width: 80%;
-      margin-top: 30px;
+      justify-content: center;
+      align-items: center;
+      gap: 50px;
+      margin-top: 50px;
     }
 
     .circle-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      position: relative;
+      width: 150px;
+      height: 150px;
     }
 
-    svg {
+    .circle-container svg {
       transform: rotate(-90deg);
     }
 
-    circle {
+    .circle-bg {
+      fill: none;
+      stroke: black;
+      stroke-width: 10;
+    }
+
+    .circle-progress {
       fill: none;
       stroke-width: 10;
       stroke-linecap: round;
+      stroke-dasharray: 440;
+      stroke-dashoffset: 440;
+      transition: stroke-dashoffset 1s linear, stroke 0.3s;
     }
 
-    .bg {
-      stroke: #e0e0e0;
-    }
-
-    .progress {
-      stroke-dasharray: 314; /* Full circumference (2πr) for r=50 */
-      stroke-dashoffset: 314;
-      transition: stroke-dashoffset 2s ease;
-    }
-
-    .label {
+    .percentage {
       position: absolute;
-      font-size: 20px;
-      font-weight: bold;
-      color: #333;
-      text-align: center;
-    }
-
-    .circle-wrapper {
-      position: relative;
-      width: 120px;
-      height: 120px;
-    }
-
-    .circle-wrapper .label {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      font-size: 22px;
+      font-weight: bold;
+      color: white;
     }
   </style>
 </head>
 <body>
-
-  <header>
-    <h1>SafeGoals Fixtures</h1>
-  </header>
-
-  <div class="fixture-container">
-    <!-- Home -->
+  <h1>SafeGoals - Fixtures</h1>
+  <div class="container">
     <div class="circle-container">
-      <div class="circle-wrapper">
-        <svg width="120" height="120">
-          <circle class="bg" cx="60" cy="60" r="50"></circle>
-          <circle class="progress" id="home-progress" cx="60" cy="60" r="50"></circle>
-        </svg>
-        <div class="label" id="home-label">0%</div>
-      </div>
-      <p>Home</p>
+      <svg width="150" height="150">
+        <circle class="circle-bg" cx="75" cy="75" r="70"></circle>
+        <circle id="homeCircle" class="circle-progress" cx="75" cy="75" r="70"></circle>
+      </svg>
+      <div id="homePercentage" class="percentage">0%</div>
+      <p>Home GSP</p>
     </div>
 
-    <!-- Away -->
     <div class="circle-container">
-      <div class="circle-wrapper">
-        <svg width="120" height="120">
-          <circle class="bg" cx="60" cy="60" r="50"></circle>
-          <circle class="progress" id="away-progress" cx="60" cy="60" r="50"></circle>
-        </svg>
-        <div class="label" id="away-label">0%</div>
-      </div>
-      <p>Away</p>
+      <svg width="150" height="150">
+        <circle class="circle-bg" cx="75" cy="75" r="70"></circle>
+        <circle id="awayCircle" class="circle-progress" cx="75" cy="75" r="70"></circle>
+      </svg>
+      <div id="awayPercentage" class="percentage">0%</div>
+      <p>Away GSP</p>
     </div>
   </div>
 
   <script>
-    // Initialize Supabase
-    const supabaseUrl = "https://YOUR_PROJECT.supabase.co";
-    const supabaseKey = "YOUR_ANON_KEY";
+    // --- SUPABASE CONNECTION ---
+    const supabaseUrl = "https://YOUR-PROJECT.supabase.co";
+    const supabaseKey = "YOUR-ANON-KEY";
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    // Animate circle fill
-    function animateCircle(progressEl, labelEl, value) {
-      const circumference = 2 * Math.PI * 50; // r = 50
-      let color = value < 50 ? "red" : "green";
-      progressEl.style.stroke = color;
-
-      let current = 0;
-      const interval = setInterval(() => {
-        if (current >= value) {
-          clearInterval(interval);
-        } else {
-          current++;
-          let offset = circumference - (current / 100) * circumference;
-          progressEl.style.strokeDashoffset = offset;
-          labelEl.textContent = current + "%";
-        }
-      }, 20); // speed
-    }
+    // Dummy fixture ID just for example
+    const fixtureId = 1;
 
     async function loadData() {
-      // Replace "fixtures" with your actual table
-      let { data, error } = await supabase
+      // Replace with your table & column names
+      const { data, error } = await supabase
         .from("fixtures")
         .select("home_gsp, away_gsp")
+        .eq("id", fixtureId)
         .single();
 
       if (error) {
-        console.error(error);
+        console.error("Error loading data:", error);
         return;
       }
 
-      let homeGSP = data.home_gsp;
-      let awayGSP = data.away_gsp;
-
-      let homeProgress = document.getElementById("home-progress");
-      let homeLabel = document.getElementById("home-label");
-      let awayProgress = document.getElementById("away-progress");
-      let awayLabel = document.getElementById("away-label");
-
-      animateCircle(homeProgress, homeLabel, homeGSP);
-      animateCircle(awayProgress, awayLabel, awayGSP);
+      animateCircle("homeCircle", "homePercentage", data.home_gsp);
+      animateCircle("awayCircle", "awayPercentage", data.away_gsp);
     }
 
+    function animateCircle(circleId, textId, gsp) {
+      const circle = document.getElementById(circleId);
+      const text = document.getElementById(textId);
+
+      const radius = 70;
+      const circumference = 2 * Math.PI * radius;
+
+      circle.style.strokeDasharray = circumference;
+      circle.style.strokeDashoffset = circumference;
+
+      // Set color condition
+      circle.style.stroke = gsp < 50 ? "red" : "green";
+
+      let progress = 0;
+      const step = () => {
+        if (progress <= gsp) {
+          const offset = circumference - (progress / 100) * circumference;
+          circle.style.strokeDashoffset = offset;
+          text.textContent = progress + "%";
+          progress++;
+          requestAnimationFrame(step);
+        }
+      };
+      step();
+    }
+
+    // Run on load
     loadData();
   </script>
 </body>
