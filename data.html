@@ -3,190 +3,166 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Fixtures</title>
+  <title>SafeGoals - Fixtures</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
   <style>
-    :root {
-      --bg-dark: #0f0f0f;
-      --card-bg: #1a1a1a;
-      --text-light: #f5f5f5;
-      --text-muted: #aaa;
-      --circle-bg: #000;
-      --circle-fill: #00ff99;
-    }
-
     body {
-      background: var(--bg-dark);
-      color: var(--text-light);
-      font-family: 'Segoe UI', sans-serif;
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
       margin: 0;
-      padding: 1rem;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
-    .fixtures-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1rem;
-    }
-
-    .fixture-card {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 1rem;
+    header {
       text-align: center;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      margin: 20px;
+      animation: fadeInDown 1.5s ease-in-out;
     }
 
-    .fixture-card:hover {
-      transform: scale(1.02);
-      box-shadow: 0 6px 14px rgba(0,0,0,0.5);
+    @keyframes fadeInDown {
+      0% { opacity: 0; transform: translateY(-30px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
 
-    .fixture-names {
-      font-size: 1.1rem;
-      font-weight: bold;
-      margin-bottom: 0.8rem;
-    }
-
-    .fixture-scores {
+    .fixture-container {
       display: flex;
-      justify-content: center;
-      gap: 1.5rem;
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
+      justify-content: space-around;
+      width: 80%;
+      margin-top: 30px;
     }
 
-    .uploaded-time {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      margin-top: 0.8rem;
-    }
-
-    /* Circles */
-    .circles {
+    .circle-container {
       display: flex;
-      justify-content: center;
-      gap: 2rem;
+      flex-direction: column;
+      align-items: center;
     }
 
-    .circle {
-      position: relative;
-      width: 100px;
-      height: 100px;
-    }
-
-    .circle svg {
+    svg {
       transform: rotate(-90deg);
-      width: 100%;
-      height: 100%;
     }
 
-    .circle circle {
+    circle {
       fill: none;
-      stroke-width: 12;
-      r: 45;
-      cx: 50;
-      cy: 50;
+      stroke-width: 10;
+      stroke-linecap: round;
     }
 
-    .circle-bg {
-      stroke: var(--circle-bg);
+    .bg {
+      stroke: #e0e0e0;
     }
 
-    .circle-fill {
-      stroke: var(--circle-fill);
-      stroke-dasharray: 283; /* 2πr with r=45 */
-      stroke-dashoffset: 283;
-      transition: stroke-dashoffset 1.5s ease;
+    .progress {
+      stroke-dasharray: 314; /* Full circumference (2πr) for r=50 */
+      stroke-dashoffset: 314;
+      transition: stroke-dashoffset 2s ease;
     }
 
-    .circle-label {
+    .label {
       position: absolute;
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+      text-align: center;
+    }
+
+    .circle-wrapper {
+      position: relative;
+      width: 120px;
+      height: 120px;
+    }
+
+    .circle-wrapper .label {
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      font-size: 0.9rem;
-      text-align: center;
     }
   </style>
 </head>
 <body>
-  <div id="fixture-list" class="fixtures-grid">Loading fixtures...</div>
+
+  <header>
+    <h1>SafeGoals Fixtures</h1>
+  </header>
+
+  <div class="fixture-container">
+    <!-- Home -->
+    <div class="circle-container">
+      <div class="circle-wrapper">
+        <svg width="120" height="120">
+          <circle class="bg" cx="60" cy="60" r="50"></circle>
+          <circle class="progress" id="home-progress" cx="60" cy="60" r="50"></circle>
+        </svg>
+        <div class="label" id="home-label">0%</div>
+      </div>
+      <p>Home</p>
+    </div>
+
+    <!-- Away -->
+    <div class="circle-container">
+      <div class="circle-wrapper">
+        <svg width="120" height="120">
+          <circle class="bg" cx="60" cy="60" r="50"></circle>
+          <circle class="progress" id="away-progress" cx="60" cy="60" r="50"></circle>
+        </svg>
+        <div class="label" id="away-label">0%</div>
+      </div>
+      <p>Away</p>
+    </div>
+  </div>
 
   <script>
-    const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Initialize Supabase
+    const supabaseUrl = "https://YOUR_PROJECT.supabase.co";
+    const supabaseKey = "YOUR_ANON_KEY";
+    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    document.addEventListener('DOMContentLoaded', async () => {
-      const fixtureList = document.getElementById('fixture-list');
+    // Animate circle fill
+    function animateCircle(progressEl, labelEl, value) {
+      const circumference = 2 * Math.PI * 50; // r = 50
+      let color = value < 50 ? "red" : "green";
+      progressEl.style.stroke = color;
 
-      const { data, error } = await supabaseClient
-        .from('fixtures')
-        .select('*')
-        .order('created_at', { ascending: false });
+      let current = 0;
+      const interval = setInterval(() => {
+        if (current >= value) {
+          clearInterval(interval);
+        } else {
+          current++;
+          let offset = circumference - (current / 100) * circumference;
+          progressEl.style.strokeDashoffset = offset;
+          labelEl.textContent = current + "%";
+        }
+      }, 20); // speed
+    }
 
-      if (error || !data || data.length === 0) {
-        fixtureList.innerHTML = '<p>No fixtures found or error loading data.</p>';
+    async function loadData() {
+      // Replace "fixtures" with your actual table
+      let { data, error } = await supabase
+        .from("fixtures")
+        .select("home_gsp, away_gsp")
+        .single();
+
+      if (error) {
         console.error(error);
         return;
       }
 
-      fixtureList.innerHTML = data.map((f, index) => {
-        const uploadedAt = new Date(f.created_at).toLocaleString();
-        const home = Number(f.home_gsp) || 0;
-        const away = Number(f.away_gsp) || 0;
+      let homeGSP = data.home_gsp;
+      let awayGSP = data.away_gsp;
 
-        return `
-          <div class="fixture-card">
-            <div class="fixture-names">${f.home_name} vs ${f.away_name}</div>
-            <div class="fixture-scores">
-              <span>${home}</span>
-              <span>${away}</span>
-            </div>
-            <div class="circles">
-              <div class="circle">
-                <svg>
-                  <circle class="circle-bg"></circle>
-                  <circle class="circle-fill" id="homeCircle-${index}"></circle>
-                </svg>
-                <div class="circle-label">${f.home_name}<br>${home}%</div>
-              </div>
-              <div class="circle">
-                <svg>
-                  <circle class="circle-bg"></circle>
-                  <circle class="circle-fill" id="awayCircle-${index}"></circle>
-                </svg>
-                <div class="circle-label">${f.away_name}<br>${away}%</div>
-              </div>
-            </div>
-            <div class="uploaded-time">Uploaded: ${uploadedAt}</div>
-          </div>
-        `;
-      }).join('');
+      let homeProgress = document.getElementById("home-progress");
+      let homeLabel = document.getElementById("home-label");
+      let awayProgress = document.getElementById("away-progress");
+      let awayLabel = document.getElementById("away-label");
 
-      // Animate circles on load
-      data.forEach((f, index) => {
-        const home = Number(f.home_gsp) || 0;
-        const away = Number(f.away_gsp) || 0;
+      animateCircle(homeProgress, homeLabel, homeGSP);
+      animateCircle(awayProgress, awayLabel, awayGSP);
+    }
 
-        const circumference = 2 * Math.PI * 45; // r=45
-        const homeOffset = circumference - (Math.min(home, 100) / 100) * circumference;
-        const awayOffset = circumference - (Math.min(away, 100) / 100) * circumference;
-
-        const homeCircle = document.getElementById(`homeCircle-${index}`);
-        const awayCircle = document.getElementById(`awayCircle-${index}`);
-
-        if (homeCircle) {
-          homeCircle.style.strokeDasharray = circumference;
-          setTimeout(() => homeCircle.style.strokeDashoffset = homeOffset, 100);
-        }
-        if (awayCircle) {
-          awayCircle.style.strokeDasharray = circumference;
-          setTimeout(() => awayCircle.style.strokeDashoffset = awayOffset, 100);
-        }
-      });
-    });
+    loadData();
   </script>
 </body>
 </html>
