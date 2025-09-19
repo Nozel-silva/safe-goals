@@ -63,6 +63,12 @@
       margin-top: 0.8rem;
     }
 
+    .prediction-text {
+      font-size: 0.85rem;
+      margin-top: 0.6rem;
+      color: var(--accent, #00ff99);
+    }
+
     /* Circles */
     .circles {
       display: flex;
@@ -119,6 +125,13 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    function getPredictionText(value) {
+      if (value >= 76 && value <= 100) return "over 1.5✔️";
+      if (value >= 50 && value <= 75) return "over 0.5✔️";
+      if (value >= 30 && value <= 49) return "weak over 0.5";
+      return "";
+    }
+
     document.addEventListener('DOMContentLoaded', async () => {
       const fixtureList = document.getElementById('fixture-list');
 
@@ -138,9 +151,11 @@
         const home = Number(f.home_gsp) || 0;
         const away = Number(f.away_gsp) || 0;
 
-        // decide stroke color based on value
         const homeColor = home < 50 ? 'var(--circle-low)' : 'var(--circle-fill)';
         const awayColor = away < 50 ? 'var(--circle-low)' : 'var(--circle-fill)';
+
+        const homePrediction = getPredictionText(home);
+        const awayPrediction = getPredictionText(away);
 
         return `
           <div class="fixture-card">
@@ -164,6 +179,10 @@
                 </svg>
                 <div class="circle-label">${f.away_name}<br>${away}%</div>
               </div>
+            </div>
+            <div class="prediction-text">
+              ${f.home_name}: ${homePrediction} <br>
+              ${f.away_name}: ${awayPrediction}
             </div>
             <div class="uploaded-time">Uploaded: ${uploadedAt}</div>
           </div>
