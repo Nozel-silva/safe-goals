@@ -9,6 +9,7 @@
     :root {
       --bg-dark: #0f0f0f;
       --card-bg: #1a1a1a;
+      --accent: #00ff99;
       --text-light: #f5f5f5;
       --text-muted: #aaa;
     }
@@ -46,44 +47,33 @@
       margin-bottom: 0.5rem;
     }
 
-    .circles {
+    .circle-container {
       display: flex;
       justify-content: center;
       gap: 2rem;
       margin: 1rem 0;
     }
 
-    .circle-wrapper {
+    .circle {
       position: relative;
-      width: 80px;
-      height: 80px;
+      width: 100px;
+      height: 100px;
     }
 
-    .circle-wrapper svg {
-      transform: rotate(-90deg);
+    .circle canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
     }
 
-    .circle-bg {
-      fill: none;
-      stroke: #000;
-      stroke-width: 10;
-    }
-
-    .circle-progress {
-      fill: none;
-      stroke-width: 10;
-      stroke-linecap: round;
-      stroke-dasharray: 0 219.9; /* start hidden */
-      transition: stroke-dasharray 1.5s ease;
-    }
-
-    .circle-text {
+    .circle-value {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       font-size: 1rem;
       font-weight: bold;
+      color: white;
     }
 
     .uploaded-time {
@@ -100,29 +90,35 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    function createCircle(gsp, total, color) {
-      const radius = 35;
-      const circumference = 2 * Math.PI * radius;
-      const percent = total > 0 ? (gsp / total) : 0;
-      const dash = circumference * percent;
+    function drawCircle(canvas, percent, color) {
+      const ctx = canvas.getContext("2d");
+      const radius = canvas.width / 2 - 5;
+      let progress = 0;
+      const step = percent / 60; // controls animation speed
 
-      const wrapper = document.createElement("div");
-      wrapper.className = "circle-wrapper";
-      wrapper.innerHTML = `
-        <svg viewBox="0 0 80 80">
-          <circle class="circle-bg" cx="40" cy="40" r="${radius}"></circle>
-          <circle class="circle-progress" cx="40" cy="40" r="${radius}" stroke="${color}"></circle>
-        </svg>
-        <div class="circle-text">${gsp}</div>
-      `;
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Animate after DOM is ready
-      requestAnimationFrame(() => {
-        const progress = wrapper.querySelector(".circle-progress");
-        progress.setAttribute("stroke-dasharray", \`\${dash} \${circumference - dash}\`);
-      });
+        // background circle (black)
+        ctx.beginPath();
+        ctx.arc(canvas.width/2, canvas.height/2, radius, 0, 2 * Math.PI);
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 10;
+        ctx.stroke();
 
-      return wrapper;
+        // foreground arc (animated)
+        ctx.beginPath();
+        ctx.arc(canvas.width/2, canvas.height/2, radius, -Math.PI/2, -Math.PI/2 + 2 * Math.PI * progress);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 10;
+        ctx.stroke();
+
+        if (progress < percent) {
+          progress += step;
+          requestAnimationFrame(animate);
+        }
+      }
+      animate();
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
@@ -139,26 +135,38 @@
         return;
       }
 
-      fixtureList.innerHTML = "";
-      data.forEach(f => {
+      fixtureList.innerHTML = data.map(f => {
         const uploadedAt = new Date(f.created_at).toLocaleString();
         const total = f.home_gsp + f.away_gsp;
+        const homePercent = total > 0 ? f.home_gsp / total : 0;
+        const awayPercent = total > 0 ? f.away_gsp / total : 0;
 
-        const card = document.createElement("div");
-        card.className = "fixture-card";
-        card.innerHTML = `
-          <div class="fixture-names">${f.home_name} vs ${f.away_name}</div>
-          <div class="uploaded-time">Uploaded: ${uploadedAt}</div>
+        const cardId = `card-${f.id}`;
+        return `
+          <div class="fixture-card" id="${cardId}">
+            <div class="fixture-names">${f.home_name} vs ${f.away_name}</div>
+            <div class="circle-container">
+              <div class="circle">
+                <canvas width="100" height="100" id="homeCircle-${f.id}"></canvas>
+                <div class="circle-value">${f.home_gsp}</div>
+              </div>
+              <div class="circle">
+                <canvas width="100" height="100" id="awayCircle-${f.id}"></canvas>
+                <div class="circle-value">${f.away_gsp}</div>
+              </div>
+            </div>
+            <div class="uploaded-time">Uploaded: ${uploadedAt}</div>
+          </div>
+          <script>
+            (function(){
+              const homeCanvas = document.getElementById("homeCircle-${f.id}");
+              const awayCanvas = document.getElementById("awayCircle-${f.id}");
+              drawCircle(homeCanvas, ${homePercent}, "red");
+              drawCircle(awayCanvas, ${awayPercent}, "green");
+            })();
+          </script>
         `;
-
-        const circlesDiv = document.createElement("div");
-        circlesDiv.className = "circles";
-        circlesDiv.appendChild(createCircle(f.home_gsp, total, "red"));
-        circlesDiv.appendChild(createCircle(f.away_gsp, total, "green"));
-
-        card.appendChild(circlesDiv);
-        fixtureList.appendChild(card);
-      });
+      }).join('');
     });
   </script>
 </body>
