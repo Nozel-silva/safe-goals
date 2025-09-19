@@ -4,55 +4,97 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SafeGoals - Fixtures</title>
+  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
       background: #f9f9f9;
+      color: #333;
       text-align: center;
+    }
+    header {
       padding: 20px;
+      font-size: 28px;
+      font-weight: bold;
+      background: black;
+      color: white;
+      animation: fadeIn 1.5s ease-in-out;
     }
-
-    h1 {
-      animation: fadeInDown 1s ease-in-out;
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(-20px);}
+      to {opacity: 1; transform: translateY(0);}
     }
-
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
     .fixture {
+      margin: 20px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 400px;
+    }
+    .teams {
       display: flex;
       justify-content: space-around;
       align-items: center;
-      margin: 40px 0;
+      margin-top: 15px;
     }
-
     .team {
       text-align: center;
     }
-
-    canvas {
-      width: 120px;
-      height: 120px;
+    .circle {
+      position: relative;
+      width: 100px;
+      height: 100px;
+    }
+    .circle svg {
+      transform: rotate(-90deg);
+      width: 100px;
+      height: 100px;
+    }
+    .circle circle {
+      fill: none;
+      stroke-width: 10;
+    }
+    .circle .bg {
+      stroke: black;
+    }
+    .circle .progress {
+      stroke-linecap: round;
+      stroke-dasharray: 283;
+      stroke-dashoffset: 283;
+      transition: stroke-dashoffset 1.5s ease;
+    }
+    .circle span {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-weight: bold;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
-  <h1>SafeGoals - Fixtures</h1>
+  <header>SafeGoals - Fixtures</header>
   <div id="fixtures"></div>
 
   <script>
-    // 🔑 Replace with your Supabase details
-    const supabaseUrl = "https://YOUR_PROJECT.supabase.co";
-    const supabaseKey = "YOUR_PUBLIC_ANON_KEY";
-    const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    const SUPABASE_URL = "https://YOUR_PROJECT.supabase.co"; 
+    const SUPABASE_ANON_KEY = "YOUR_ANON_KEY";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     async function loadFixtures() {
-      const { data, error } = await supabase.from("fixtures").select("*");
+      const { data, error } = await supabaseClient
+        .from("fixtures")
+        .select("home_team, away_team, home_gsp, away_gsp")
+        .limit(5);
+
       if (error) {
-        console.error("Error:", error);
+        console.error("Error fetching fixtures:", error);
         return;
       }
 
@@ -60,64 +102,63 @@
       container.innerHTML = "";
 
       data.forEach(fixture => {
-        const div = document.createElement("div");
-        div.className = "fixture";
-        div.innerHTML = `
-          <div class="team">
-            <canvas id="home-${fixture.id}"></canvas>
-            <p>${fixture.home_team} (${fixture.home_gsp} GSP)</p>
-          </div>
-          <strong>vs</strong>
-          <div class="team">
-            <canvas id="away-${fixture.id}"></canvas>
-            <p>${fixture.away_team} (${fixture.away_gsp} GSP)</p>
+        const fixtureEl = document.createElement("div");
+        fixtureEl.className = "fixture";
+
+        fixtureEl.innerHTML = `
+          <div><strong>${fixture.home_team}</strong> vs <strong>${fixture.away_team}</strong></div>
+          <div class="teams">
+            <div class="team">
+              <div class="circle">
+                <svg>
+                  <circle class="bg" cx="50" cy="50" r="45"></circle>
+                  <circle class="progress" cx="50" cy="50" r="45"></circle>
+                </svg>
+                <span>${fixture.home_gsp}%</span>
+              </div>
+              <div>${fixture.home_team}</div>
+            </div>
+            <div class="team">
+              <div class="circle">
+                <svg>
+                  <circle class="bg" cx="50" cy="50" r="45"></circle>
+                  <circle class="progress" cx="50" cy="50" r="45"></circle>
+                </svg>
+                <span>${fixture.away_gsp}%</span>
+              </div>
+              <div>${fixture.away_team}</div>
+            </div>
           </div>
         `;
-        container.appendChild(div);
 
-        drawCircle(`home-${fixture.id}`, fixture.home_gsp);
-        drawCircle(`away-${fixture.id}`, fixture.away_gsp);
+        container.appendChild(fixtureEl);
+
+        // Animate home circle
+        animateCircle(
+          fixtureEl.querySelectorAll(".progress")[0],
+          fixture.home_gsp
+        );
+
+        // Animate away circle
+        animateCircle(
+          fixtureEl.querySelectorAll(".progress")[1],
+          fixture.away_gsp
+        );
       });
     }
 
-    function drawCircle(canvasId, percentage) {
-      const canvas = document.getElementById(canvasId);
-      const ctx = canvas.getContext("2d");
-      const radius = canvas.width / 2 - 10;
-      let current = 0;
+    function animateCircle(circleEl, value) {
+      const radius = 45;
+      const circumference = 2 * Math.PI * radius;
+      const offset = circumference - (value / 100) * circumference;
 
-      // ✅ Circle color logic
-      const color = percentage < 50 ? "red" : "green";
+      // Color condition: red if < 50, else green
+      circleEl.style.stroke = value < 50 ? "red" : "green";
 
-      function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Background circle (black base)
-        ctx.beginPath();
-        ctx.arc(canvas.width/2, canvas.height/2, radius, 0, 2 * Math.PI);
-        ctx.strokeStyle = "#000";
-        ctx.lineWidth = 10;
-        ctx.stroke();
-
-        // Progress arc
-        ctx.beginPath();
-        ctx.arc(
-          canvas.width/2,
-          canvas.height/2,
-          radius,
-          -Math.PI/2,
-          (2 * Math.PI * current/100) - Math.PI/2
-        );
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 10;
-        ctx.stroke();
-
-        if (current < percentage) {
-          current++;
-          requestAnimationFrame(animate);
-        }
-      }
-      animate();
+      setTimeout(() => {
+        circleEl.style.strokeDasharray = circumference;
+        circleEl.style.strokeDashoffset = offset;
+      }, 300);
     }
 
     loadFixtures();
