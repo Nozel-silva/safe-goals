@@ -13,6 +13,7 @@
       --text-muted: #aaa;
       --circle-bg: #000;
       --circle-fill: #00ff99;
+      --circle-low: #ff3333; /* red for <50 */
     }
 
     body {
@@ -137,6 +138,10 @@
         const home = Number(f.home_gsp) || 0;
         const away = Number(f.away_gsp) || 0;
 
+        // decide stroke color based on value
+        const homeColor = home < 50 ? 'var(--circle-low)' : 'var(--circle-fill)';
+        const awayColor = away < 50 ? 'var(--circle-low)' : 'var(--circle-fill)';
+
         return `
           <div class="fixture-card">
             <div class="fixture-names">${f.home_name} vs ${f.away_name}</div>
@@ -148,14 +153,14 @@
               <div class="circle">
                 <svg>
                   <circle class="circle-bg"></circle>
-                  <circle class="circle-fill" id="homeCircle-${index}"></circle>
+                  <circle class="circle-fill" id="homeCircle-${index}" style="stroke:${homeColor}"></circle>
                 </svg>
                 <div class="circle-label">${f.home_name}<br>${home}%</div>
               </div>
               <div class="circle">
                 <svg>
                   <circle class="circle-bg"></circle>
-                  <circle class="circle-fill" id="awayCircle-${index}"></circle>
+                  <circle class="circle-fill" id="awayCircle-${index}" style="stroke:${awayColor}"></circle>
                 </svg>
                 <div class="circle-label">${f.away_name}<br>${away}%</div>
               </div>
