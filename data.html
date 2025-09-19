@@ -4,137 +4,123 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SafeGoals - Fixtures</title>
-  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #111;
-      color: white;
+      background: #f9f9f9;
       text-align: center;
       padding: 20px;
     }
 
-    .container {
+    h1 {
+      animation: fadeInDown 1s ease-in-out;
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fixture {
       display: flex;
-      justify-content: center;
+      justify-content: space-around;
       align-items: center;
-      gap: 50px;
-      margin-top: 50px;
+      margin: 40px 0;
     }
 
-    .circle-container {
-      position: relative;
-      width: 150px;
-      height: 150px;
+    .team {
+      text-align: center;
     }
 
-    .circle-container svg {
-      transform: rotate(-90deg);
-    }
-
-    .circle-bg {
-      fill: none;
-      stroke: black;
-      stroke-width: 10;
-    }
-
-    .circle-progress {
-      fill: none;
-      stroke-width: 10;
-      stroke-linecap: round;
-      stroke-dasharray: 440;
-      stroke-dashoffset: 440;
-      transition: stroke-dashoffset 1s linear, stroke 0.3s;
-    }
-
-    .percentage {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 22px;
-      font-weight: bold;
-      color: white;
+    canvas {
+      width: 120px;
+      height: 120px;
     }
   </style>
 </head>
 <body>
   <h1>SafeGoals - Fixtures</h1>
-  <div class="container">
-    <div class="circle-container">
-      <svg width="150" height="150">
-        <circle class="circle-bg" cx="75" cy="75" r="70"></circle>
-        <circle id="homeCircle" class="circle-progress" cx="75" cy="75" r="70"></circle>
-      </svg>
-      <div id="homePercentage" class="percentage">0%</div>
-      <p>Home GSP</p>
-    </div>
-
-    <div class="circle-container">
-      <svg width="150" height="150">
-        <circle class="circle-bg" cx="75" cy="75" r="70"></circle>
-        <circle id="awayCircle" class="circle-progress" cx="75" cy="75" r="70"></circle>
-      </svg>
-      <div id="awayPercentage" class="percentage">0%</div>
-      <p>Away GSP</p>
-    </div>
-  </div>
+  <div id="fixtures"></div>
 
   <script>
-    // --- SUPABASE CONNECTION ---
-    const supabaseUrl = "https://YOUR-PROJECT.supabase.co";
-    const supabaseKey = "YOUR-ANON-KEY";
+    // 🔑 Replace with your Supabase details
+    const supabaseUrl = "https://YOUR_PROJECT.supabase.co";
+    const supabaseKey = "YOUR_PUBLIC_ANON_KEY";
     const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-    // Dummy fixture ID just for example
-    const fixtureId = 1;
-
-    async function loadData() {
-      // Replace with your table & column names
-      const { data, error } = await supabase
-        .from("fixtures")
-        .select("home_gsp, away_gsp")
-        .eq("id", fixtureId)
-        .single();
-
+    async function loadFixtures() {
+      const { data, error } = await supabase.from("fixtures").select("*");
       if (error) {
-        console.error("Error loading data:", error);
+        console.error("Error:", error);
         return;
       }
 
-      animateCircle("homeCircle", "homePercentage", data.home_gsp);
-      animateCircle("awayCircle", "awayPercentage", data.away_gsp);
+      const container = document.getElementById("fixtures");
+      container.innerHTML = "";
+
+      data.forEach(fixture => {
+        const div = document.createElement("div");
+        div.className = "fixture";
+        div.innerHTML = `
+          <div class="team">
+            <canvas id="home-${fixture.id}"></canvas>
+            <p>${fixture.home_team} (${fixture.home_gsp} GSP)</p>
+          </div>
+          <strong>vs</strong>
+          <div class="team">
+            <canvas id="away-${fixture.id}"></canvas>
+            <p>${fixture.away_team} (${fixture.away_gsp} GSP)</p>
+          </div>
+        `;
+        container.appendChild(div);
+
+        drawCircle(`home-${fixture.id}`, fixture.home_gsp);
+        drawCircle(`away-${fixture.id}`, fixture.away_gsp);
+      });
     }
 
-    function animateCircle(circleId, textId, gsp) {
-      const circle = document.getElementById(circleId);
-      const text = document.getElementById(textId);
+    function drawCircle(canvasId, percentage) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext("2d");
+      const radius = canvas.width / 2 - 10;
+      let current = 0;
 
-      const radius = 70;
-      const circumference = 2 * Math.PI * radius;
+      // ✅ Circle color logic
+      const color = percentage < 50 ? "red" : "green";
 
-      circle.style.strokeDasharray = circumference;
-      circle.style.strokeDashoffset = circumference;
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Set color condition
-      circle.style.stroke = gsp < 50 ? "red" : "green";
+        // Background circle (black base)
+        ctx.beginPath();
+        ctx.arc(canvas.width/2, canvas.height/2, radius, 0, 2 * Math.PI);
+        ctx.strokeStyle = "#000";
+        ctx.lineWidth = 10;
+        ctx.stroke();
 
-      let progress = 0;
-      const step = () => {
-        if (progress <= gsp) {
-          const offset = circumference - (progress / 100) * circumference;
-          circle.style.strokeDashoffset = offset;
-          text.textContent = progress + "%";
-          progress++;
-          requestAnimationFrame(step);
+        // Progress arc
+        ctx.beginPath();
+        ctx.arc(
+          canvas.width/2,
+          canvas.height/2,
+          radius,
+          -Math.PI/2,
+          (2 * Math.PI * current/100) - Math.PI/2
+        );
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 10;
+        ctx.stroke();
+
+        if (current < percentage) {
+          current++;
+          requestAnimationFrame(animate);
         }
-      };
-      step();
+      }
+      animate();
     }
 
-    // Run on load
-    loadData();
+    loadFixtures();
   </script>
 </body>
 </html>
