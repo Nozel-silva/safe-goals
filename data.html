@@ -9,7 +9,6 @@
     :root {
       --bg-dark: #0f0f0f;
       --card-bg: #1a1a1a;
-      --accent: #00ff99;
       --text-light: #f5f5f5;
       --text-muted: #aaa;
     }
@@ -74,7 +73,7 @@
       fill: none;
       stroke-width: 10;
       stroke-linecap: round;
-      stroke-dasharray: 0 251.2; /* default hidden */
+      stroke-dasharray: 0 219.9; /* start hidden */
       transition: stroke-dasharray 1.5s ease;
     }
 
@@ -102,7 +101,7 @@
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     function createCircle(gsp, total, color) {
-      const radius = 40;
+      const radius = 35;
       const circumference = 2 * Math.PI * radius;
       const percent = total > 0 ? (gsp / total) : 0;
       const dash = circumference * percent;
@@ -110,7 +109,7 @@
       const wrapper = document.createElement("div");
       wrapper.className = "circle-wrapper";
       wrapper.innerHTML = `
-        <svg width="80" height="80">
+        <svg viewBox="0 0 80 80">
           <circle class="circle-bg" cx="40" cy="40" r="${radius}"></circle>
           <circle class="circle-progress" cx="40" cy="40" r="${radius}" stroke="${color}"></circle>
         </svg>
