@@ -6,79 +6,109 @@
   <title>Fixtures</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
   <style>
-    :root {
+    :root{
       --bg-dark: #0f0f0f;
       --card-bg: #1a1a1a;
-      --accent: #00ff99;
       --text-light: #f5f5f5;
       --text-muted: #aaa;
+      --home-fill: #ff3b3b; /* red for home */
+      --away-fill: #00ff99; /* green for away */
+      --circle-bg: #000000; /* black base */
     }
 
+    *{box-sizing:border-box}
     body {
       background: var(--bg-dark);
       color: var(--text-light);
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
       margin: 0;
       padding: 1rem;
     }
 
     .fixtures-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 1rem;
+      align-items: start;
     }
 
     .fixture-card {
-      background: var(--card-bg);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
       border-radius: 12px;
       padding: 1rem;
       text-align: center;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.6);
     }
-
-    .fixture-card:hover {
-      transform: scale(1.02);
-      box-shadow: 0 6px 14px rgba(0,0,0,0.5);
+    .fixture-card:hover{
+      transform: translateY(-6px);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.75);
     }
 
     .fixture-names {
-      font-size: 1.1rem;
-      font-weight: bold;
-      margin-bottom: 0.5rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      color: var(--text-light);
     }
 
-    .circle-container {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      margin: 1rem 0;
+    .fixture-scores {
+      display:flex;
+      justify-content:center;
+      gap:1rem;
+      font-size: 1.05rem;
+      margin-bottom: 0.6rem;
+      color: var(--text-muted);
     }
 
-    .circle {
-      position: relative;
-      width: 100px;
-      height: 100px;
+    .circles {
+      display:flex;
+      justify-content:center;
+      gap: 1.2rem;
+      align-items:center;
+      margin-bottom: 0.6rem;
     }
 
-    .circle canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
+    .circle-wrap {
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap: 0.4rem;
+      width: 120px;
     }
 
-    .circle-value {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 1rem;
-      font-weight: bold;
-      color: white;
+    /* SVG container */
+    .progress-svg {
+      width: 96px;
+      height: 96px;
+      display:block;
+    }
+
+    /* labels inside circle */
+    .circle-label {
+      text-align:center;
+      color: #fff;
+      font-weight:700;
+      font-size:0.85rem;
+      line-height:1;
+    }
+    .circle-sub {
+      color: var(--text-muted);
+      font-weight:600;
+      font-size:0.75rem;
+      margin-top:2px;
     }
 
     .uploaded-time {
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       color: var(--text-muted);
+      margin-top:0.6rem;
+    }
+
+    /* Smooth stroke animation via transition */
+    .progress-circle {
+      transition: stroke-dashoffset 1.2s cubic-bezier(.22,.9,.32,1);
+      transform-origin: 50% 50%;
     }
   </style>
 </head>
@@ -90,35 +120,27 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    function drawCircle(canvas, percent, color) {
-      const ctx = canvas.getContext("2d");
-      const radius = canvas.width / 2 - 5;
-      let progress = 0;
-      const step = percent / 60; // controls animation speed
-
-      function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // background circle (black)
-        ctx.beginPath();
-        ctx.arc(canvas.width/2, canvas.height/2, radius, 0, 2 * Math.PI);
-        ctx.strokeStyle = "#000";
-        ctx.lineWidth = 10;
-        ctx.stroke();
-
-        // foreground arc (animated)
-        ctx.beginPath();
-        ctx.arc(canvas.width/2, canvas.height/2, radius, -Math.PI/2, -Math.PI/2 + 2 * Math.PI * progress);
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 10;
-        ctx.stroke();
-
-        if (progress < percent) {
-          progress += step;
-          requestAnimationFrame(animate);
-        }
-      }
-      animate();
+    // helpful util to create SVG circle markup
+    function createCircleSVG(id, color, percent){
+      // svg circle params
+      const size = 96;
+      const r = 40; // radius
+      const stroke = 12;
+      const circumference = 2 * Math.PI * r;
+      const dash = (percent/100) * circumference;
+      // We'll set dashoffset to circumference (0 filled) initially. We'll animate to target later.
+      return `
+        <svg class="progress-svg" viewBox="0 0 ${size} ${size}" aria-hidden="true">
+          <!-- rotate SVG so stroke starts at top -->
+          <g transform="rotate(-90 ${size/2} ${size/2})">
+            <!-- background base (black) -->
+            <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${getComputedStyle(document.documentElement).getPropertyValue('--circle-bg') || '#000'}" stroke-width="${stroke}" />
+            <!-- progress (colored) -->
+            <circle id="${id}" class="progress-circle" cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}" stroke-linecap="round"
+              stroke-dasharray="${circumference}" stroke-dashoffset="${circumference}" />
+          </g>
+        </svg>
+      `;
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
@@ -130,44 +152,119 @@
         .order('created_at', { ascending: false });
 
       if (error || !data || data.length === 0) {
-        fixtureList.innerHTML = '<p>No fixtures found or error loading data.</p>';
+        fixtureList.innerHTML = '<p style="color:var(--text-muted)">No fixtures found or error loading data.</p>';
         console.error(error);
         return;
       }
 
-      fixtureList.innerHTML = data.map(f => {
+      // Build HTML for all fixtures
+      fixtureList.innerHTML = data.map((f, idx) => {
         const uploadedAt = new Date(f.created_at).toLocaleString();
-        const total = f.home_gsp + f.away_gsp;
-        const homePercent = total > 0 ? f.home_gsp / total : 0;
-        const awayPercent = total > 0 ? f.away_gsp / total : 0;
 
-        const cardId = `card-${f.id}`;
+        const home = Number(f.home_gsp) || 0;
+        const away = Number(f.away_gsp) || 0;
+        const total = (home + away) || 1;
+
+        const homePercent = Math.round((home / total) * 100);
+        const awayPercent = Math.round((away / total) * 100);
+
+        // create SVG markup with unique ids
+        const homeSvg = createCircleSVG(`homeCircle-${idx}`, 'var(--home-fill)', homePercent);
+        const awaySvg = createCircleSVG(`awayCircle-${idx}`, 'var(--away-fill)', awayPercent);
+
         return `
-          <div class="fixture-card" id="${cardId}">
-            <div class="fixture-names">${f.home_name} vs ${f.away_name}</div>
-            <div class="circle-container">
-              <div class="circle">
-                <canvas width="100" height="100" id="homeCircle-${f.id}"></canvas>
-                <div class="circle-value">${f.home_gsp}</div>
+          <div class="fixture-card" data-idx="${idx}">
+            <div class="fixture-names">${escapeHtml(f.home_name)} vs ${escapeHtml(f.away_name)}</div>
+
+            <div class="fixture-scores" aria-hidden="true">
+              <div style="min-width:40px">${home}</div>
+              <div style="min-width:40px">${away}</div>
+            </div>
+
+            <div class="circles">
+              <div class="circle-wrap">
+                ${homeSvg}
+                <div class="circle-label" id="homeLabel-${idx}">
+                  <div>${homePercent}%</div>
+                  <div class="circle-sub">${home} gsp</div>
+                </div>
               </div>
-              <div class="circle">
-                <canvas width="100" height="100" id="awayCircle-${f.id}"></canvas>
-                <div class="circle-value">${f.away_gsp}</div>
+
+              <div class="circle-wrap">
+                ${awaySvg}
+                <div class="circle-label" id="awayLabel-${idx}">
+                  <div>${awayPercent}%</div>
+                  <div class="circle-sub">${away} gsp</div>
+                </div>
               </div>
             </div>
+
             <div class="uploaded-time">Uploaded: ${uploadedAt}</div>
           </div>
-          <script>
-            (function(){
-              const homeCanvas = document.getElementById("homeCircle-${f.id}");
-              const awayCanvas = document.getElementById("awayCircle-${f.id}");
-              drawCircle(homeCanvas, ${homePercent}, "red");
-              drawCircle(awayCanvas, ${awayPercent}, "green");
-            })();
-          </script>
         `;
       }).join('');
+
+      // After DOM insertion, animate each SVG stroke from 0 to the percentage
+      // Use requestAnimationFrame to ensure styles applied, then change dashoffset to trigger transition
+      data.forEach((f, idx) => {
+        const home = Number(f.home_gsp) || 0;
+        const away = Number(f.away_gsp) || 0;
+        const total = (home + away) || 1;
+
+        const homePercent = (home / total) * 100;
+        const awayPercent = (away / total) * 100;
+
+        // compute circumference from the rendered circle
+        const homeCircle = document.getElementById(`homeCircle-${idx}`);
+        const awayCircle = document.getElementById(`awayCircle-${idx}`);
+
+        // If element exists, compute values and animate
+        if (homeCircle) {
+          const r = homeCircle.getAttribute('r');
+          const circumference = 2 * Math.PI * r;
+          const targetOffset = circumference * (1 - (homePercent / 100));
+
+          // Ensure transition occurs: set initial dashoffset then on next frame set target
+          homeCircle.style.strokeDasharray = circumference;
+          homeCircle.style.strokeDashoffset = circumference; // start fully empty
+
+          // do the animation with a small stagger for nicer effect
+          setTimeout(() => {
+            // trigger paint first then update dashoffset
+            requestAnimationFrame(() => {
+              homeCircle.style.strokeDashoffset = targetOffset;
+            });
+          }, 120 + idx * 60);
+        }
+
+        if (awayCircle) {
+          const r = awayCircle.getAttribute('r');
+          const circumference = 2 * Math.PI * r;
+          const targetOffset = circumference * (1 - (awayPercent / 100));
+
+          awayCircle.style.strokeDasharray = circumference;
+          awayCircle.style.strokeDashoffset = circumference;
+
+          setTimeout(() => {
+            requestAnimationFrame(() => {
+              awayCircle.style.strokeDashoffset = targetOffset;
+            });
+          }, 220 + idx * 60);
+        }
+      });
+
     });
+
+    // simple helper to escape HTML in the names
+    function escapeHtml(str){
+      if (!str) return '';
+      return String(str)
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'",'&#39;');
+    }
   </script>
 </body>
 </html>
