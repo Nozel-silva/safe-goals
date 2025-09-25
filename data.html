@@ -138,7 +138,7 @@
       const { data, error } = await supabaseClient
         .from('fixtures')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: true });
 
       if (error || !data || data.length === 0) {
         fixtureList.innerHTML = '<p>No fixtures found or error loading data.</p>';
