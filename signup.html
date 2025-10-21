@@ -104,7 +104,7 @@
         const { id, email: userEmail } = data.user;
 
         // Insert into 'profiles'
-        await supabaseClient.from("profiles").insert([{ id, email: userEmail }]);
+        await supabaseClient.from("users").insert([{ id, email: userEmail }]);
 
         // Insert initial 2 tokens into 'user_tokens'
         await supabaseClient.from("user_tokens").insert([{ user_id: id, token_count: 2 }]);
