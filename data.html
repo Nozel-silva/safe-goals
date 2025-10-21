@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Fixtures</title>
+  <title>Fixtures Dashboard</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
   <style>
     :root {
@@ -13,7 +13,8 @@
       --text-muted: #aaa;
       --circle-bg: #000;
       --circle-fill: #00ff99;
-      --circle-low: #ff3333; /* red for <50 */
+      --circle-low: #ff3333;
+      --accent: #00ff99;
     }
 
     body {
@@ -21,7 +22,75 @@
       color: var(--text-light);
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
+      padding: 1.5rem;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #121212;
+      padding: 1rem 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 0 10px rgba(0,255,153,0.2);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    header h2 {
+      font-size: 1.4rem;
+      color: var(--accent);
+      margin: 0;
+    }
+
+    .token-display {
+      background: #1c1c1c;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      color: var(--accent);
+      font-weight: bold;
+      box-shadow: 0 0 10px rgba(0,255,153,0.2);
+    }
+
+    .logout-btn {
+      background: #ff3333;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background: #ff0000;
+    }
+
+    /* Booking Codes */
+    .booking-section {
+      background: var(--card-bg);
+      border-radius: 12px;
       padding: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .booking-section h3 {
+      color: var(--accent);
+      margin-bottom: 0.8rem;
+    }
+
+    .booking-code {
+      background: #222;
+      padding: 0.6rem 0.8rem;
+      border-radius: 8px;
+      margin: 0.4rem 0;
+      font-family: monospace;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .fixtures-grid {
@@ -66,7 +135,7 @@
     .prediction-text {
       font-size: 0.85rem;
       margin-top: 0.6rem;
-      color: var(--accent, #00ff99);
+      color: var(--accent);
     }
 
     /* Circles */
@@ -102,7 +171,7 @@
 
     .circle-fill {
       stroke: var(--circle-fill);
-      stroke-dasharray: 283; /* 2πr with r=45 */
+      stroke-dasharray: 283;
       stroke-dashoffset: 283;
       transition: stroke-dashoffset 1.5s ease;
     }
@@ -115,16 +184,143 @@
       font-size: 0.9rem;
       text-align: center;
     }
+
+    /* Login Modal */
+    #login-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: var(--bg-dark);
+      color: var(--text-light);
+    }
+
+    #login-container input {
+      padding: 0.6rem;
+      border: none;
+      border-radius: 6px;
+      width: 220px;
+      margin: 0.5rem 0;
+      background: #222;
+      color: #fff;
+    }
+
+    #login-container button {
+      padding: 0.6rem 1rem;
+      background: var(--accent);
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <div id="fixture-list" class="fixtures-grid">Loading fixtures...</div>
+
+  <!-- LOGIN -->
+  <div id="login-container">
+    <h2>Login to SafeGoals</h2>
+    <input type="text" id="username" placeholder="Enter username" />
+    <button id="loginBtn">Login</button>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="dashboard" style="display:none;">
+    <header>
+      <h2>Fixtures Dashboard</h2>
+      <div class="token-display">Tokens: <span id="tokenCount">100</span></div>
+      <button class="logout-btn" id="logoutBtn">Logout</button>
+    </header>
+
+    <section class="booking-section">
+      <h3>Booking Codes</h3>
+      <div id="booking-codes">Loading booking codes...</div>
+    </section>
+
+    <div id="fixture-list" class="fixtures-grid">Loading fixtures...</div>
+  </div>
 
   <script>
     const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    const loginContainer = document.getElementById('login-container');
+    const dashboard = document.getElementById('dashboard');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const fixtureList = document.getElementById('fixture-list');
+    const bookingCodesDiv = document.getElementById('booking-codes');
+    const tokenCount = document.getElementById('tokenCount');
+
+    let sessionTimer;
+
+    // Login logic
+    loginBtn.addEventListener('click', () => {
+      const username = document.getElementById('username').value.trim();
+      if (!username) return alert("Enter a username!");
+
+      localStorage.setItem('user', username);
+      localStorage.setItem('tokens', '100');
+      startSessionTimer();
+      showDashboard();
+    });
+
+    // Logout logic
+    logoutBtn.addEventListener('click', () => {
+      clearSession();
+    });
+
+    function showDashboard() {
+      loginContainer.style.display = 'none';
+      dashboard.style.display = 'block';
+      tokenCount.textContent = localStorage.getItem('tokens') || '0';
+      loadFixtures();
+      loadBookingCodes();
+    }
+
+    function startSessionTimer() {
+      clearTimeout(sessionTimer);
+      sessionTimer = setTimeout(() => {
+        alert('Session expired. Please log in again.');
+        clearSession();
+      }, 5 * 60 * 1000); // 5 minutes
+    }
+
+    function clearSession() {
+      localStorage.removeItem('user');
+      dashboard.style.display = 'none';
+      loginContainer.style.display = 'flex';
+    }
+
+    // Auto-login check
+    if (localStorage.getItem('user')) {
+      showDashboard();
+      startSessionTimer();
+    }
+
+    // Booking codes
+    async function loadBookingCodes() {
+      const { data, error } = await supabaseClient
+        .from('booking_codes')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error || !data || data.length === 0) {
+        bookingCodesDiv.innerHTML = '<p>No booking codes uploaded.</p>';
+        return;
+      }
+
+      bookingCodesDiv.innerHTML = data.map(c => `
+        <div class="booking-code">
+          <span>${c.code}</span>
+          <small>${new Date(c.created_at).toLocaleString()}</small>
+        </div>
+      `).join('');
+    }
+
+    // Fixtures
     function getPredictionText(value) {
       if (value >= 76 && value <= 100) return "over 1.5✔️";
       if (value >= 50 && value <= 75) return "over 0.5✔️";
@@ -132,9 +328,7 @@
       return "";
     }
 
-    document.addEventListener('DOMContentLoaded', async () => {
-      const fixtureList = document.getElementById('fixture-list');
-
+    async function loadFixtures() {
       const { data, error } = await supabaseClient
         .from('fixtures')
         .select('*')
@@ -142,7 +336,6 @@
 
       if (error || !data || data.length === 0) {
         fixtureList.innerHTML = '<p>No fixtures found or error loading data.</p>';
-        console.error(error);
         return;
       }
 
@@ -153,7 +346,6 @@
 
         const homeColor = home < 50 ? 'var(--circle-low)' : 'var(--circle-fill)';
         const awayColor = away < 50 ? 'var(--circle-low)' : 'var(--circle-fill)';
-
         const homePrediction = getPredictionText(home);
         const awayPrediction = getPredictionText(away);
 
@@ -189,15 +381,13 @@
         `;
       }).join('');
 
-      // Animate circles on load
+      // Animate circles
       data.forEach((f, index) => {
         const home = Number(f.home_gsp) || 0;
         const away = Number(f.away_gsp) || 0;
-
-        const circumference = 2 * Math.PI * 45; // r=45
+        const circumference = 2 * Math.PI * 45;
         const homeOffset = circumference - (Math.min(home, 100) / 100) * circumference;
         const awayOffset = circumference - (Math.min(away, 100) / 100) * circumference;
-
         const homeCircle = document.getElementById(`homeCircle-${index}`);
         const awayCircle = document.getElementById(`awayCircle-${index}`);
 
@@ -210,7 +400,8 @@
           setTimeout(() => awayCircle.style.strokeDashoffset = awayOffset, 100);
         }
       });
-    });
+    }
   </script>
 </body>
-</html>
+  </html>
+  
