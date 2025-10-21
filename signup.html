@@ -1,115 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Signup</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SafeGoals – Sign Up</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
   <style>
-    body{font-family:Arial,Helvetica,sans-serif;background:#f4f6f9;padding:24px}
-    .card{max-width:520px;margin:24px auto;padding:20px;background:#fff;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,.06)}
-    input{width:100%;padding:10px;margin:8px 0;border:1px solid #ddd;border-radius:6px}
-    button{padding:10px 14px;border-radius:6px;border:0;background:#2d9cdb;color:#fff;font-weight:600;cursor:pointer}
-    .popup{position:fixed;right:20px;top:20px;padding:12px 16px;background:#28a745;color:#fff;border-radius:8px;display:none}
-    .error{background:#d9534f}
-    .status{margin-top:10px;color:#333}
+    body {
+      background: #0f0f0f;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+    input {
+      padding: 0.7rem;
+      width: 230px;
+      margin: 0.4rem 0;
+      border-radius: 6px;
+      border: none;
+      background: #1a1a1a;
+      color: #fff;
+    }
+    button {
+      padding: 0.7rem 1rem;
+      background: #00ff99;
+      border: none;
+      border-radius: 6px;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #00cc77;
+    }
+    #message {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+    #message.success {
+      color: #00ff99;
+    }
+    #message.error {
+      color: #ff3333;
+    }
   </style>
 </head>
 <body>
-
-  <div class="card">
-    <h2>Create account</h2>
-    <form id="signupForm">
-      <input id="fullName" type="text" placeholder="Full name" required />
-      <input id="email" type="email" placeholder="Email" required />
-      <input id="password" type="password" placeholder="Password" required />
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button id="submitBtn" type="submit">Sign up</button>
-      </div>
-      <div id="status" class="status"></div>
-    </form>
-  </div>
-
-  <div id="popup" class="popup">Verification email sent — check your inbox</div>
+  <h2>Create your SafeGoals Account</h2>
+  <input type="email" id="email" placeholder="Enter your email" />
+  <input type="password" id="password" placeholder="Enter a password" />
+  <button id="signUpBtn">Sign Up</button>
+  <div id="message"></div>
 
   <script>
-    // --- Your Supabase project (keys you provided)
-    const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
+    const SUPABASE_URL = "https://ccmsjcnuyrngqxwrswfe.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY";
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const signUpBtn = document.getElementById("signUpBtn");
+    const msgBox = document.getElementById("message");
 
-    const form = document.getElementById('signupForm');
-    const popup = document.getElementById('popup');
-    const statusEl = document.getElementById('status');
-    const submitBtn = document.getElementById('submitBtn');
+    signUpBtn.addEventListener("click", async () => {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
 
-    function showPopup(msg, isError = false) {
-      popup.textContent = msg;
-      popup.classList.toggle('error', !!isError);
-      popup.style.display = 'block';
-      setTimeout(() => popup.style.display = 'none', 3000);
-    }
+      msgBox.textContent = "";
+      msgBox.className = "";
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      submitBtn.disabled = true;
-      statusEl.textContent = '';
-
-      const full_name = document.getElementById('fullName').value.trim();
-      const email = document.getElementById('email').value.trim().toLowerCase();
-      const password = document.getElementById('password').value;
-
-      // 1) Check if email exists in users table
-      const { data: existing, error: checkErr } = await supabase
-        .from('users')
-        .select('id')
-        .ilike('email', email)
-        .limit(1);
-
-      if (checkErr) {
-        statusEl.textContent = 'Error checking email: ' + checkErr.message;
-        submitBtn.disabled = false;
-        return;
-      }
-      if (existing && existing.length > 0) {
-        statusEl.textContent = 'Email already registered.';
-        submitBtn.disabled = false;
+      if (!email || !password) {
+        msgBox.textContent = "Please enter both email and password.";
+        msgBox.className = "error";
         return;
       }
 
-      // 2) Insert into users table
-      const { data: inserted, error: insertErr } = await supabase
-        .from('users')
-        .insert([{ full_name, email }])
-        .select()
-        .single();
+      signUpBtn.disabled = true;
+      signUpBtn.textContent = "Creating account...";
 
-      if (insertErr) {
-        statusEl.textContent = 'Could not save user: ' + insertErr.message;
-        submitBtn.disabled = false;
-        return;
-      }
-
-      // 3) Trigger Supabase Auth signup (sends verification mail)
-      const { data: authData, error: authErr } = await supabase.auth.signUp({
+      const { data, error } = await supabaseClient.auth.signUp({
         email,
-        password
+        password,
       });
 
-      if (authErr) {
-        // rollback inserted row if auth failed
-        await supabase.from('users').delete().eq('id', inserted.id);
-        statusEl.textContent = 'Signup failed: ' + authErr.message;
-        submitBtn.disabled = false;
+      if (error) {
+        msgBox.textContent = error.message;
+        msgBox.className = "error";
+        signUpBtn.disabled = false;
+        signUpBtn.textContent = "Sign Up";
         return;
       }
 
-      // 4) Success
-      showPopup('Verification email sent to ' + email);
-      statusEl.textContent = 'Verification email sent. Check your inbox.';
-      form.reset();
-      submitBtn.disabled = false;
+      // Show confirmation message
+      msgBox.textContent = "✅ Sign-up successful! Please check your email for the confirmation link.";
+      msgBox.className = "success";
+
+      // Create profile & tokens for the user
+      if (data.user) {
+        const { id, email: userEmail } = data.user;
+
+        // Insert into 'profiles'
+        await supabaseClient.from("profiles").insert([{ id, email: userEmail }]);
+
+        // Insert initial 2 tokens into 'user_tokens'
+        await supabaseClient.from("user_tokens").insert([{ user_id: id, token_count: 2 }]);
+      }
+
+      signUpBtn.textContent = "Sign Up";
     });
   </script>
 </body>
