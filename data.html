@@ -241,167 +241,188 @@
     <div id="fixture-list" class="fixtures-grid">Loading fixtures...</div>
   </div>
 
-  <script>
-    const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+ <script>
+  const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const loginContainer = document.getElementById('login-container');
-    const dashboard = document.getElementById('dashboard');
-    const loginBtn = document.getElementById('loginBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const fixtureList = document.getElementById('fixture-list');
-    const bookingCodesDiv = document.getElementById('booking-codes');
-    const tokenCount = document.getElementById('tokenCount');
+  const loginContainer = document.getElementById('login-container');
+  const dashboard = document.getElementById('dashboard');
+  const loginBtn = document.getElementById('loginBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const fixtureList = document.getElementById('fixture-list');
+  const bookingCodesDiv = document.getElementById('booking-codes');
+  const tokenCount = document.getElementById('tokenCount');
 
-    let sessionTimer;
+  let sessionTimer;
 
-    // Login logic
-    loginBtn.addEventListener('click', () => {
-      const username = document.getElementById('username').value.trim();
-      if (!username) return alert("Enter a username!");
+  // Detect source URL (referrer)
+  const ref = document.referrer;
+  let daysAllowed = 0;
+  if (ref.includes("www.index.html")) {
+    daysAllowed = 30;
+  } else if (ref.includes("www.index2.html")) {
+    daysAllowed = 7;
+  }
 
-      localStorage.setItem('user', username);
-      localStorage.setItem('tokens', '100');
-      startSessionTimer();
-      showDashboard();
-    });
+  // Login logic
+  loginBtn.addEventListener('click', async () => {
+    const username = document.getElementById('username').value.trim();
+    if (!username) return alert("Enter a username!");
 
-    // Logout logic
-    logoutBtn.addEventListener('click', () => {
-      clearSession();
-    });
+    const { data: existing, error: fetchError } = await supabaseClient
+      .from('user_access')
+      .select('*')
+      .eq('username', username)
+      .single();
 
-    function showDashboard() {
-      loginContainer.style.display = 'none';
-      dashboard.style.display = 'block';
-      tokenCount.textContent = localStorage.getItem('tokens') || '0';
-      loadFixtures();
-      loadBookingCodes();
-    }
+    const now = new Date();
+    let expiryDate;
 
-    function startSessionTimer() {
-      clearTimeout(sessionTimer);
-      sessionTimer = setTimeout(() => {
-        alert('Session expired. Please log in again.');
-        clearSession();
-      }, 5 * 60 * 1000); // 5 minutes
-    }
-
-    function clearSession() {
-      localStorage.removeItem('user');
-      dashboard.style.display = 'none';
-      loginContainer.style.display = 'flex';
-    }
-
-    // Auto-login check
-    if (localStorage.getItem('user')) {
-      showDashboard();
-      startSessionTimer();
-    }
-
-    // Booking codes
-    async function loadBookingCodes() {
-      const { data, error } = await supabaseClient
-        .from('booking_codes')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error || !data || data.length === 0) {
-        bookingCodesDiv.innerHTML = '<p>No booking codes uploaded.</p>';
+    if (existing) {
+      expiryDate = new Date(existing.expiry_date);
+      if (expiryDate < now) {
+        alert("Your access has expired. Redirecting to renew...");
+        window.location.href = "renew.html";
         return;
       }
-
-      bookingCodesDiv.innerHTML = data.map(c => `
-        <div class="booking-code">
-          <span>${c.code}</span>
-          <small>${new Date(c.created_at).toLocaleString()}</small>
-        </div>
-      `).join('');
-    }
-
-    // Fixtures
-    function getPredictionText(value) {
-      if (value >= 76 && value <= 100) return "over 1.5✔️";
-      if (value >= 50 && value <= 75) return "over 0.5✔️";
-      if (value >= 30 && value <= 49) return "weak over 0.5";
-      return "";
-    }
-
-    async function loadFixtures() {
-      const { data, error } = await supabaseClient
-        .from('fixtures')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error || !data || data.length === 0) {
-        fixtureList.innerHTML = '<p>No fixtures found or error loading data.</p>';
-        return;
-      }
-
-      fixtureList.innerHTML = data.map((f, index) => {
-        const uploadedAt = new Date(f.created_at).toLocaleString();
-        const home = Number(f.home_gsp) || 0;
-        const away = Number(f.away_gsp) || 0;
-
-        const homeColor = home < 50 ? 'var(--circle-low)' : 'var(--circle-fill)';
-        const awayColor = away < 50 ? 'var(--circle-low)' : 'var(--circle-fill)';
-        const homePrediction = getPredictionText(home);
-        const awayPrediction = getPredictionText(away);
-
-        return `
-          <div class="fixture-card">
-            <div class="fixture-names">${f.home_name} vs ${f.away_name}</div>
-            <div class="fixture-scores">
-              <span>${home}</span>
-              <span>${away}</span>
-            </div>
-            <div class="circles">
-              <div class="circle">
-                <svg>
-                  <circle class="circle-bg"></circle>
-                  <circle class="circle-fill" id="homeCircle-${index}" style="stroke:${homeColor}"></circle>
-                </svg>
-                <div class="circle-label">${f.home_name}<br>${home}%</div>
-              </div>
-              <div class="circle">
-                <svg>
-                  <circle class="circle-bg"></circle>
-                  <circle class="circle-fill" id="awayCircle-${index}" style="stroke:${awayColor}"></circle>
-                </svg>
-                <div class="circle-label">${f.away_name}<br>${away}%</div>
-              </div>
-            </div>
-            <div class="prediction-text">
-              ${f.home_name}: ${homePrediction} <br>
-              ${f.away_name}: ${awayPrediction}
-            </div>
-            <div class="uploaded-time">Uploaded: ${uploadedAt}</div>
-          </div>
-        `;
-      }).join('');
-
-      // Animate circles
-      data.forEach((f, index) => {
-        const home = Number(f.home_gsp) || 0;
-        const away = Number(f.away_gsp) || 0;
-        const circumference = 2 * Math.PI * 45;
-        const homeOffset = circumference - (Math.min(home, 100) / 100) * circumference;
-        const awayOffset = circumference - (Math.min(away, 100) / 100) * circumference;
-        const homeCircle = document.getElementById(`homeCircle-${index}`);
-        const awayCircle = document.getElementById(`awayCircle-${index}`);
-
-        if (homeCircle) {
-          homeCircle.style.strokeDasharray = circumference;
-          setTimeout(() => homeCircle.style.strokeDashoffset = homeOffset, 100);
-        }
-        if (awayCircle) {
-          awayCircle.style.strokeDasharray = circumference;
-          setTimeout(() => awayCircle.style.strokeDashoffset = awayOffset, 100);
-        }
+    } else {
+      expiryDate = new Date();
+      expiryDate.setDate(expiryDate.getDate() + (daysAllowed || 7)); // default 7 if no ref
+      await supabaseClient.from('user_access').insert({
+        username,
+        start_date: new Date().toISOString(),
+        expiry_date: expiryDate.toISOString(),
+        source_url: ref || "direct"
       });
     }
-  </script>
+
+    localStorage.setItem('user', username);
+    showDashboard();
+  });
+
+  // Logout logic
+  logoutBtn.addEventListener('click', () => {
+    clearSession();
+  });
+
+  function showDashboard() {
+    loginContainer.style.display = 'none';
+    dashboard.style.display = 'block';
+    loadFixtures();
+    loadBookingCodes();
+    checkAccessDays();
+  }
+
+  async function checkAccessDays() {
+    const username = localStorage.getItem('user');
+    if (!username) return;
+
+    const { data, error } = await supabaseClient
+      .from('user_access')
+      .select('*')
+      .eq('username', username)
+      .single();
+
+    if (!data) {
+      alert("Access record not found. Redirecting to renew...");
+      window.location.href = "renew.html";
+      return;
+    }
+
+    const now = new Date();
+    const expiry = new Date(data.expiry_date);
+    const diff = expiry - now;
+
+    if (diff <= 0) {
+      alert("Access expired. Redirecting...");
+      window.location.href = "renew.html";
+      return;
+    }
+
+    const daysLeft = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    tokenCount.textContent = `${daysLeft} day${daysLeft > 1 ? 's' : ''} left`;
+  }
+
+  function clearSession() {
+    localStorage.removeItem('user');
+    dashboard.style.display = 'none';
+    loginContainer.style.display = 'flex';
+  }
+
+  if (localStorage.getItem('user')) {
+    showDashboard();
+  }
+
+  // Booking codes
+  async function loadBookingCodes() {
+    const { data, error } = await supabaseClient
+      .from('booking_codes')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error || !data || data.length === 0) {
+      bookingCodesDiv.innerHTML = '<p>No booking codes uploaded.</p>';
+      return;
+    }
+
+    bookingCodesDiv.innerHTML = data.map(c => `
+      <div class="booking-code">
+        <span>${c.code}</span>
+        <small>${new Date(c.created_at).toLocaleString()}</small>
+      </div>
+    `).join('');
+  }
+
+  // Fixtures
+  function getPredictionText(value) {
+    if (value >= 76 && value <= 100) return "over 1.5✔️";
+    if (value >= 50 && value <= 75) return "over 0.5✔️";
+    if (value >= 30 && value <= 49) return "weak over 0.5";
+    return "";
+  }
+
+  async function loadFixtures() {
+    const { data, error } = await supabaseClient
+      .from('fixtures')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error || !data || data.length === 0) {
+      fixtureList.innerHTML = '<p>No fixtures found or error loading data.</p>';
+      return;
+    }
+
+    fixtureList.innerHTML = data.map((f, index) => {
+      const uploadedAt = new Date(f.created_at).toLocaleString();
+      const home = Number(f.home_gsp) || 0;
+      const away = Number(f.away_gsp) || 0;
+
+      const homeColor = home < 50 ? 'var(--circle-low)' : 'var(--circle-fill)';
+      const awayColor = away < 50 ? 'var(--circle-low)' : 'var(--circle-fill)';
+      const homePrediction = getPredictionText(home);
+      const awayPrediction = getPredictionText(away);
+
+      return `
+        <div class="fixture-card">
+          <div class="fixture-names">${f.home_name} vs ${f.away_name}</div>
+          <div class="fixture-scores">
+            <span>${home}</span>
+            <span>${away}</span>
+          </div>
+          <div class="prediction-text">
+            ${f.home_name}: ${homePrediction} <br>
+            ${f.away_name}: ${awayPrediction}
+          </div>
+          <div class="uploaded-time">Uploaded: ${uploadedAt}</div>
+        </div>
+      `;
+    }).join('');
+  }
+</script>
+
+      
 </body>
   </html>
+
   
