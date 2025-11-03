@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Select Subscription — L.E.V.I</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #c7e5ff, #eaf4ff);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #004466;
+      text-align: center;
+    }
+    .container {
+      background: white;
+      padding: 40px 60px;
+      border-radius: 18px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    h2 { margin-bottom: 25px; }
+    button {
+      display: block;
+      width: 220px;
+      padding: 14px;
+      margin: 15px auto;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+    .monthly { background-color: #0077cc; color: white; }
+    .weekly { background-color: #00b894; color: white; }
+    button:hover { opacity: 0.9; transform: scale(1.05); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Select Your Subscription</h2>
+    <button class="monthly" onclick="window.location.href='monthly.html'">Monthly Plan</button>
+    <button class="weekly" onclick="window.location.href='weekly.html'">Weekly Plan</button>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function checkLogin() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        window.location.href = 'login.html';
+      }
+    }
+
+    checkLogin();
+  </script>
+</body>
+</html>
