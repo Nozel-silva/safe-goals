@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Processing Subscription — L.E.V.I</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #d4f1ff, #e3f8ff);
+      color: #004466;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+    .message {
+      background: white;
+      padding: 40px 60px;
+      border-radius: 16px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="message">
+    <h2>Processing your subscription...</h2>
+    <p id="status">Please wait a moment.</p>
+  </div>
+
+  <script>
+    const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function processSubscription() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const referrer = document.referrer;
+      let daysToAdd = 0;
+
+      if (referrer.includes('monthly.html')) {
+        daysToAdd = 30;
+      } else if (referrer.includes('weekly.html')) {
+        daysToAdd = 7;
+      } else {
+        document.getElementById('status').innerText = "Invalid source. Please try again.";
+        return;
+      }
+
+      // Ensure the user_access table exists before running this
+      const { data: existing } = await supabase
+        .from('user_access')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (existing) {
+        const newDays = existing.days_left + daysToAdd;
+        await supabase.from('user_access').update({ days_left: newDays }).eq('user_id', user.id);
+      } else {
+        await supabase.from('user_access').insert([{ user_id: user.id, days_left: daysToAdd }]);
+      }
+
+      document.getElementById('status').innerText = `Subscription updated! Added ${daysToAdd} days. Redirecting...`;
+      setTimeout(() => window.location.href = 'data.html', 4000);
+    }
+
+    processSubscription();
+  </script>
+</body>
+</html>
