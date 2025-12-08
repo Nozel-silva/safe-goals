@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Fixtures Dashboard</title>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
+
   <style>
     :root {
       --bg-dark: #0f0f0f;
@@ -43,54 +45,6 @@
       font-size: 1.4rem;
       color: var(--accent);
       margin: 0;
-    }
-
-    .token-display {
-      background: #1c1c1c;
-      padding: 0.6rem 1rem;
-      border-radius: 8px;
-      color: var(--accent);
-      font-weight: bold;
-      box-shadow: 0 0 10px rgba(0,255,153,0.2);
-    }
-
-    .logout-btn {
-      background: #ff3333;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 0.5rem 1rem;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background 0.3s ease;
-    }
-
-    .logout-btn:hover {
-      background: #ff0000;
-    }
-
-    /* Booking Codes */
-    .booking-section {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .booking-section h3 {
-      color: var(--accent);
-      margin-bottom: 0.8rem;
-    }
-
-    .booking-code {
-      background: #222;
-      padding: 0.6rem 0.8rem;
-      border-radius: 8px;
-      margin: 0.4rem 0;
-      font-family: monospace;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
     }
 
     .fixtures-grid {
@@ -138,230 +92,60 @@
       color: var(--accent);
     }
 
-    /* Circles */
-    .circles {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
+    .booking-section {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
     }
 
-    .circle {
-      position: relative;
-      width: 100px;
-      height: 100px;
-    }
-
-    .circle svg {
-      transform: rotate(-90deg);
-      width: 100%;
-      height: 100%;
-    }
-
-    .circle circle {
-      fill: none;
-      stroke-width: 12;
-      r: 45;
-      cx: 50;
-      cy: 50;
-    }
-
-    .circle-bg {
-      stroke: var(--circle-bg);
-    }
-
-    .circle-fill {
-      stroke: var(--circle-fill);
-      stroke-dasharray: 283;
-      stroke-dashoffset: 283;
-      transition: stroke-dashoffset 1.5s ease;
-    }
-
-    .circle-label {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 0.9rem;
-      text-align: center;
-    }
-
-    /* Login Modal */
-    #login-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background: var(--bg-dark);
-      color: var(--text-light);
-    }
-
-    #login-container input {
-      padding: 0.6rem;
-      border: none;
-      border-radius: 6px;
-      width: 220px;
-      margin: 0.5rem 0;
+    .booking-code {
       background: #222;
-      color: #fff;
-    }
-
-    #login-container button {
-      padding: 0.6rem 1rem;
-      background: var(--accent);
-      border: none;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
+      padding: 0.6rem;
+      border-radius: 8px;
+      margin: 0.4rem 0;
+      display: flex;
+      justify-content: space-between;
+      font-family: monospace;
     }
   </style>
 </head>
+
 <body>
 
-  <!-- LOGIN -->
-  <div id="login-container">
-    <h2>Login to SafeGoals</h2>
-    <input type="text" id="username" placeholder="Enter username" />
-    <button id="loginBtn">Login</button>
-  </div>
+<header>
+  <h2>SafeGoals GSP Display</h2>
+</header>
 
-  <!-- DASHBOARD -->
-  <div id="dashboard" style="display:none;">
-    <header>
-      <h2></h2>
-      <div class="token-display">Tokens: <span id="tokenCount">100</span></div>
-      <button class="logout-btn" id="logoutBtn">Logout</button>
-    </header>
+<section class="booking-section">
+  <h3>Booking Codes</h3>
+  <div id="booking-codes">Loading booking codes...</div>
+</section>
 
-    <section class="booking-section">
-      <h3>Booking Codes</h3>
-      <div id="booking-codes">Loading booking codes...</div>
-    </section>
+<div id="fixture-list" class="fixtures-grid">Loading fixtures...</div>
 
-    <div id="fixture-list" class="fixtures-grid">Loading fixtures...</div>
-  </div>
-
- <script>
+<script>
   const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
-  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  const loginContainer = document.getElementById('login-container');
-  const dashboard = document.getElementById('dashboard');
-  const loginBtn = document.getElementById('loginBtn');
-  const logoutBtn = document.getElementById('logoutBtn');
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   const fixtureList = document.getElementById('fixture-list');
   const bookingCodesDiv = document.getElementById('booking-codes');
-  const tokenCount = document.getElementById('tokenCount');
 
-  let sessionTimer;
-
-  // Detect source URL (referrer)
-  const ref = document.referrer;
-  let daysAllowed = 0;
-  if (ref.includes("www.index.html")) {
-    daysAllowed = 30;
-  } else if (ref.includes("www.index2.html")) {
-    daysAllowed = 7;
+  function getPredictionText(value) {
+    if (value >= 76) return "over 1.5✔️";
+    if (value >= 50) return "over 0.5✔️";
+    if (value >= 30) return "weak over 0.5";
+    return "";
   }
 
-  // Login logic
-  loginBtn.addEventListener('click', async () => {
-    const username = document.getElementById('username').value.trim();
-    if (!username) return alert("Enter a username!");
-
-    const { data: existing, error: fetchError } = await supabaseClient
-      .from('user_access')
-      .select('*')
-      .eq('username', username)
-      .single();
-
-    const now = new Date();
-    let expiryDate;
-
-    if (existing) {
-      expiryDate = new Date(existing.expiry_date);
-      if (expiryDate < now) {
-        alert("Your access has expired. Redirecting to renew...");
-        window.location.href = "renew.html";
-        return;
-      }
-    } else {
-      expiryDate = new Date();
-      expiryDate.setDate(expiryDate.getDate() + (daysAllowed || 7)); // default 7 if no ref
-      await supabaseClient.from('user_access').insert({
-        username,
-        start_date: new Date().toISOString(),
-        expiry_date: expiryDate.toISOString(),
-        source_url: ref || "direct"
-      });
-    }
-
-    localStorage.setItem('user', username);
-    showDashboard();
-  });
-
-  // Logout logic
-  logoutBtn.addEventListener('click', () => {
-    clearSession();
-  });
-
-  function showDashboard() {
-    loginContainer.style.display = 'none';
-    dashboard.style.display = 'block';
-    loadFixtures();
-    loadBookingCodes();
-    checkAccessDays();
-  }
-
-  async function checkAccessDays() {
-    const username = localStorage.getItem('user');
-    if (!username) return;
-
-    const { data, error } = await supabaseClient
-      .from('user_access')
-      .select('*')
-      .eq('username', username)
-      .single();
-
-    if (!data) {
-      alert("Access record not found. Redirecting to renew...");
-      window.location.href = "renew.html";
-      return;
-    }
-
-    const now = new Date();
-    const expiry = new Date(data.expiry_date);
-    const diff = expiry - now;
-
-    if (diff <= 0) {
-      alert("Access expired. Redirecting...");
-      window.location.href = "renew.html";
-      return;
-    }
-
-    const daysLeft = Math.ceil(diff / (1000 * 60 * 60 * 24));
-    tokenCount.textContent = `${daysLeft} day${daysLeft > 1 ? 's' : ''} left`;
-  }
-
-  function clearSession() {
-    localStorage.removeItem('user');
-    dashboard.style.display = 'none';
-    loginContainer.style.display = 'flex';
-  }
-
-  if (localStorage.getItem('user')) {
-    showDashboard();
-  }
-
-  // Booking codes
   async function loadBookingCodes() {
     const { data, error } = await supabaseClient
       .from('booking_codes')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (error || !data || data.length === 0) {
+    if (!data || data.length === 0) {
       bookingCodesDiv.innerHTML = '<p>No booking codes uploaded.</p>';
       return;
     }
@@ -374,34 +158,20 @@
     `).join('');
   }
 
-  // Fixtures
-  function getPredictionText(value) {
-    if (value >= 76 && value <= 100) return "over 1.5✔️";
-    if (value >= 50 && value <= 75) return "over 0.5✔️";
-    if (value >= 30 && value <= 49) return "weak over 0.5";
-    return "";
-  }
-
   async function loadFixtures() {
     const { data, error } = await supabaseClient
       .from('fixtures')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (error || !data || data.length === 0) {
-      fixtureList.innerHTML = '<p>No fixtures found or error loading data.</p>';
+    if (!data || data.length === 0) {
+      fixtureList.innerHTML = '<p>No fixtures found.</p>';
       return;
     }
 
-    fixtureList.innerHTML = data.map((f, index) => {
-      const uploadedAt = new Date(f.created_at).toLocaleString();
+    fixtureList.innerHTML = data.map(f => {
       const home = Number(f.home_gsp) || 0;
       const away = Number(f.away_gsp) || 0;
-
-      const homeColor = home < 50 ? 'var(--circle-low)' : 'var(--circle-fill)';
-      const awayColor = away < 50 ? 'var(--circle-low)' : 'var(--circle-fill)';
-      const homePrediction = getPredictionText(home);
-      const awayPrediction = getPredictionText(away);
 
       return `
         <div class="fixture-card">
@@ -411,18 +181,20 @@
             <span>${away}</span>
           </div>
           <div class="prediction-text">
-            ${f.home_name}: ${homePrediction} <br>
-            ${f.away_name}: ${awayPrediction}
+            ${f.home_name}: ${getPredictionText(home)}<br>
+            ${f.away_name}: ${getPredictionText(away)}
           </div>
-          <div class="uploaded-time">Uploaded: ${uploadedAt}</div>
+          <div class="uploaded-time">
+            Uploaded: ${new Date(f.created_at).toLocaleString()}
+          </div>
         </div>
       `;
     }).join('');
   }
+
+  loadBookingCodes();
+  loadFixtures();
 </script>
 
-      
 </body>
-  </html>
-
-  
+</html>
