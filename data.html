@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Fixtures Dashboard</title>
+  <title>SafeGoals – Risk Analysis</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
 
@@ -13,10 +13,9 @@
       --card-bg: #1a1a1a;
       --text-light: #f5f5f5;
       --text-muted: #aaa;
-      --circle-bg: #000;
-      --circle-fill: #00ff99;
-      --circle-low: #ff3333;
-      --accent: #00ff99;
+      --low: #00ff99;
+      --medium: #ffb347;
+      --high: #ff4d4d;
     }
 
     body {
@@ -28,28 +27,21 @@
     }
 
     header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       background: #121212;
       padding: 1rem 1.5rem;
       border-radius: 12px;
       margin-bottom: 1.5rem;
-      box-shadow: 0 0 10px rgba(0,255,153,0.2);
-      position: sticky;
-      top: 0;
-      z-index: 50;
+      box-shadow: 0 0 10px rgba(0,255,153,0.15);
     }
 
     header h2 {
-      font-size: 1.4rem;
-      color: var(--accent);
       margin: 0;
+      color: var(--low);
     }
 
     .fixtures-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 1rem;
     }
 
@@ -57,56 +49,39 @@
       background: var(--card-bg);
       border-radius: 12px;
       padding: 1rem;
-      text-align: center;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .fixture-card:hover {
-      transform: scale(1.02);
-      box-shadow: 0 6px 14px rgba(0,0,0,0.5);
     }
 
     .fixture-names {
       font-size: 1.1rem;
       font-weight: bold;
       margin-bottom: 0.8rem;
+      text-align: center;
     }
 
-    .fixture-scores {
+    .risk-row {
       display: flex;
-      justify-content: center;
-      gap: 1.5rem;
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
+      justify-content: space-between;
+      margin: 0.4rem 0;
+      font-size: 0.9rem;
+    }
+
+    .risk-label.low { color: var(--low); }
+    .risk-label.medium { color: var(--medium); }
+    .risk-label.high { color: var(--high); }
+
+    .section-title {
+      margin-top: 0.8rem;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      border-bottom: 1px solid #333;
+      padding-bottom: 0.3rem;
     }
 
     .uploaded-time {
-      font-size: 0.8rem;
-      color: var(--text-muted);
       margin-top: 0.8rem;
-    }
-
-    .prediction-text {
-      font-size: 0.85rem;
-      margin-top: 0.6rem;
-      color: var(--accent);
-    }
-
-    .booking-section {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .booking-code {
-      background: #222;
-      padding: 0.6rem;
-      border-radius: 8px;
-      margin: 0.4rem 0;
-      display: flex;
-      justify-content: space-between;
-      font-family: monospace;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: center;
     }
   </style>
 </head>
@@ -114,52 +89,37 @@
 <body>
 
 <header>
-  <h2>SafeGoals GSP Display</h2>
+  <h2>SafeGoals – Goal Risk Analysis</h2>
 </header>
-
-<section class="booking-section">
-  <h3>Booking Codes</h3>
-  <div id="booking-codes">Loading booking codes...</div>
-</section>
 
 <div id="fixture-list" class="fixtures-grid">Loading fixtures...</div>
 
 <script>
   const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
+  const SUPABASE_ANON_KEY = 'YOUR_KEY_HERE';
 
-  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
   const fixtureList = document.getElementById('fixture-list');
-  const bookingCodesDiv = document.getElementById('booking-codes');
 
-  function getPredictionText(value) {
-    if (value >= 76) return "over 1.5✔️";
-    if (value >= 50) return "over 0.5✔️";
-    if (value >= 30) return "weak over 0.5";
-    return "";
+  function getTeamRisk(gsp) {
+    if (gsp < 50) return { text: "High Risk", class: "high" };
+    if (gsp >= 55 && gsp <= 60) return { text: "Medium Risk", class: "medium" };
+    if (gsp >= 61 && gsp <= 90) return { text: "Low Risk", class: "low" };
+    return { text: "Unclear", class: "" };
   }
 
-  async function loadBookingCodes() {
-    const { data, error } = await supabaseClient
-      .from('booking_codes')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (!data || data.length === 0) {
-      bookingCodesDiv.innerHTML = '<p>No booking codes uploaded.</p>';
-      return;
-    }
-
-    bookingCodesDiv.innerHTML = data.map(c => `
-      <div class="booking-code">
-        <span>${c.code}</span>
-        <small>${new Date(c.created_at).toLocaleString()}</small>
-      </div>
-    `).join('');
+  function getCombinedRisk(sum) {
+    if (sum >= 140) return { text: "Low Risk", class: "low" };
+    if (sum >= 100) return { text: "Medium Risk", class: "medium" };
+    return { text: "High Risk", class: "high" };
   }
 
   async function loadFixtures() {
-    const { data, error } = await supabaseClient
+    const { data } = await supabaseClient
       .from('fixtures')
       .select('*')
       .order('created_at', { ascending: false });
@@ -172,18 +132,36 @@
     fixtureList.innerHTML = data.map(f => {
       const home = Number(f.home_gsp) || 0;
       const away = Number(f.away_gsp) || 0;
+      const combined = home + away;
+
+      const homeRisk = getTeamRisk(home);
+      const awayRisk = getTeamRisk(away);
+      const combinedRisk = getCombinedRisk(combined);
 
       return `
         <div class="fixture-card">
-          <div class="fixture-names">${f.home_name} vs ${f.away_name}</div>
-          <div class="fixture-scores">
-            <span>${home}</span>
-            <span>${away}</span>
+          <div class="fixture-names">
+            ${f.home_name} vs ${f.away_name}
           </div>
-          <div class="prediction-text">
-            ${f.home_name}: ${getPredictionText(home)}<br>
-            ${f.away_name}: ${getPredictionText(away)}
+
+          <div class="section-title">Over 0.5 Goal (Per Team)</div>
+          <div class="risk-row">
+            <span>${f.home_name} (${home}%)</span>
+            <span class="risk-label ${homeRisk.class}">${homeRisk.text}</span>
           </div>
+          <div class="risk-row">
+            <span>${f.away_name} (${away}%)</span>
+            <span class="risk-label ${awayRisk.class}">${awayRisk.text}</span>
+          </div>
+
+          <div class="section-title">Over 1.5 Goals (Combined)</div>
+          <div class="risk-row">
+            <span>Total GSP (${combined}%)</span>
+            <span class="risk-label ${combinedRisk.class}">
+              ${combinedRisk.text}
+            </span>
+          </div>
+
           <div class="uploaded-time">
             Uploaded: ${new Date(f.created_at).toLocaleString()}
           </div>
@@ -192,7 +170,6 @@
     }).join('');
   }
 
-  loadBookingCodes();
   loadFixtures();
 </script>
 
