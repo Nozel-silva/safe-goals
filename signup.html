@@ -83,7 +83,7 @@
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: window.location.origin + "/https://safe-goals-iig4.vercel.app/data.html"
+        redirectTo: window.location.origin + "/data.html"
       }
     });
 
