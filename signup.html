@@ -2,116 +2,96 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SafeGoals – Sign Up</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
+  <title>SafeGoals | Sign Up</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <style>
     body {
       background: #0f0f0f;
-      color: #fff;
+      color: #f5f5f5;
       font-family: 'Segoe UI', sans-serif;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
-      text-align: center;
+      margin: 0;
     }
-    input {
-      padding: 0.7rem;
-      width: 230px;
-      margin: 0.4rem 0;
-      border-radius: 6px;
-      border: none;
+
+    .card {
       background: #1a1a1a;
-      color: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0,255,153,0.15);
     }
+
+    h2 {
+      color: #00ff99;
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: 0.9rem;
+      color: #aaa;
+      margin-bottom: 1.5rem;
+    }
+
     button {
-      padding: 0.7rem 1rem;
-      background: #00ff99;
+      width: 100%;
+      padding: 0.75rem;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
+      background: #00ff99;
       color: #000;
       font-weight: bold;
       cursor: pointer;
-      transition: background 0.3s ease;
+      font-size: 0.95rem;
     }
+
     button:hover {
-      background: #00cc77;
-    }
-    #message {
-      margin-top: 1rem;
-      font-size: 0.9rem;
-    }
-    #message.success {
-      color: #00ff99;
-    }
-    #message.error {
-      color: #ff3333;
+      opacity: 0.9;
     }
   </style>
 </head>
+
 <body>
-  <h2>Create your SafeGoals Account</h2>
-  <input type="email" id="email" placeholder="Enter your email" />
-  <input type="password" id="password" placeholder="Enter a password" />
-  <button id="signUpBtn">Sign Up</button>
-  <div id="message"></div>
 
-  <script>
-    const SUPABASE_URL = "https://ccmsjcnuyrngqxwrswfe.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY";
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <div class="card">
+    <h2>Join SafeGoals</h2>
+    <p>Sign up to access advanced goal probability analytics.</p>
 
-    const signUpBtn = document.getElementById("signUpBtn");
-    const msgBox = document.getElementById("message");
+    <button onclick="signUpWithGoogle()">
+      Continue with Google
+    </button>
+  </div>
 
-    signUpBtn.addEventListener("click", async () => {
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
+<script>
+  const SUPABASE_URL = "https://ccmsjcnuyrngqxwrswfe.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY ";
 
-      msgBox.textContent = "";
-      msgBox.className = "";
+  const supabase = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
 
-      if (!email || !password) {
-        msgBox.textContent = "Please enter both email and password.";
-        msgBox.className = "error";
-        return;
+  async function signUpWithGoogle() {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin + "/https://safe-goals-iig4.vercel.app/data.html"
       }
-
-      signUpBtn.disabled = true;
-      signUpBtn.textContent = "Creating account...";
-
-      const { data, error } = await supabaseClient.auth.signUp({
-        email,
-        password,
-      });
-
-      if (error) {
-        msgBox.textContent = error.message;
-        msgBox.className = "error";
-        signUpBtn.disabled = false;
-        signUpBtn.textContent = "Sign Up";
-        return;
-      }
-
-      // Show confirmation message
-      msgBox.textContent = "✅ Sign-up successful! Please check your email for the confirmation link.";
-      msgBox.className = "success";
-
-      // Create profile & tokens for the user
-      if (data.user) {
-        const { id, email: userEmail } = data.user;
-
-        // Insert into 'profiles'
-        await supabaseClient.from("users").insert([{ id, email: userEmail }]);
-
-        // Insert initial 2 tokens into 'user_tokens'
-        await supabaseClient.from("user_tokens").insert([{ user_id: id, token_count: 2 }]);
-      }
-
-      signUpBtn.textContent = "Sign Up";
     });
-  </script>
+
+    if (error) {
+      alert(error.message);
+    }
+  }
+</script>
+
 </body>
 </html>
