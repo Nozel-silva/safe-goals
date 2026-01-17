@@ -6,42 +6,81 @@
   <title>SafeGoals - Submit Fixture</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
-
-  <!-- Supabase v2 -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Orbitron', sans-serif;
+    }
+
     body {
       background-color: #000;
       color: #aaffaa;
-      font-family: 'Orbitron', sans-serif;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
       min-height: 100vh;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 20px;
+      text-shadow: 0 0 5px #aaffaa, 0 0 10px #44ff44;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 5px #aaffaa, 0 0 10px #44ff44;
+      }
+      to {
+        text-shadow: 0 0 15px #55ff55, 0 0 25px #88ff88;
+      }
     }
 
     form {
-      background: #111;
-      padding: 25px;
+      background-color: #111;
+      padding: 25px 20px;
       border-radius: 10px;
-      width: 350px;
+      box-shadow: 0 0 15px #1a1a1a;
+      width: 100%;
+      max-width: 400px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 15px;
+      animation: slideUp 0.7s ease-out;
     }
 
-    input, button {
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(50px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    input {
       padding: 12px;
-      border-radius: 6px;
       border: 1px solid #aaffaa;
-      background: #000;
+      background-color: #000;
       color: #aaffaa;
+      border-radius: 6px;
     }
 
     button {
-      background: #aaffaa;
+      background-color: #aaffaa;
       color: #000;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
       font-weight: bold;
       cursor: pointer;
     }
@@ -49,29 +88,35 @@
 </head>
 
 <body>
+  <h1>🚀 SafeGoals Upload</h1>
+
   <form id="fixture-form">
-    <input id="homeName" placeholder="Home Team" required />
-    <input id="awayName" placeholder="Away Team" required />
-    <input id="homeGSP" type="number" placeholder="Home GSP" required />
-    <input id="awayGSP" type="number" placeholder="Away GSP" required />
+    <input type="text" id="homeName" placeholder="Home Team" required />
+    <input type="text" id="awayName" placeholder="Away Team" required />
+    <input type="number" id="homeGSP" placeholder="Home GSP" required />
+    <input type="number" id="awayGSP" placeholder="Away GSP" required />
     <button type="submit">Save Fixture</button>
   </form>
 
   <script>
-    const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('JS loaded ✅');
 
-    // ✅ YOUR ANON KEY (AS SENT)
-    const SUPABASE_ANON_KEY =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
+      const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
+      const SUPABASE_ANON_KEY =
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
 
-    const supabase = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY
-    );
+      const supabase = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+      );
 
-    document.getElementById('fixture-form')
-      .addEventListener('submit', async (e) => {
+      const form = document.getElementById('fixture-form');
+
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
+
+        alert('Submitting…'); // 🔥 sanity check
 
         const homeName = document.getElementById('homeName').value.trim();
         const awayName = document.getElementById('awayName').value.trim();
@@ -88,17 +133,18 @@
               away_gsp: awayGSP
             }
           ])
-          .select(); // 🔑 REQUIRED FOR V2
+          .select();
 
         if (error) {
           console.error(error);
           alert('❌ Insert failed: ' + error.message);
         } else {
-          console.log('Inserted row:', data);
-          alert('✅ Fixture saved');
-          e.target.reset();
+          console.log(data);
+          alert('✅ Fixture saved!');
+          form.reset();
         }
       });
+    });
   </script>
 </body>
 </html>
