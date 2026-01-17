@@ -163,7 +163,8 @@
           </div>
 
           <div class="uploaded-time">
-              Uploaded:  </div>
+              Uploaded:${new Date(f.created_at).toLocaleString()}
+           </div>
         </div>
       `;
     }).join('');
