@@ -204,7 +204,7 @@
     <p>
       Want full access to all fixtures and advanced insights?
       <br>
-      <a href="subscribe.html">View subscription plans →</a>
+      <a href="data.html">View more →</a>
     </p>
   </div>
 </section>
@@ -243,7 +243,7 @@
       .from("fixtures")
       .select("*")
       .order("created_at", { ascending: false })
-      .limit(5);
+      .limit(3);
 
     if (!data || data.length === 0) {
       fixtureList.innerHTML = "<p>No samples available.</p>";
