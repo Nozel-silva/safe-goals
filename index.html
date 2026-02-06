@@ -7,123 +7,292 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
   <style>
     :root {
-      --bg-dark: #0e0e0e;
-      --card-bg: #1a1a1a;
-      --text-light: #f4f4f4;
-      --text-muted: #aaa;
-      --accent: #00ff99;
-      --low: #00ff99;
-      --medium: #ffb347;
+      --bg-dark: #0a0e14;
+      --card-bg: #141a22;
+      --text-light: #f0f4f8;
+      --text-muted: #a0b0c0;
+      --accent: #00ffaa;
+      --accent-glow: rgba(0, 255, 170, 0.25);
+      --low: #00ffaa;
+      --medium: #ffaa33;
       --high: #ff4d4d;
+      --gradient: linear-gradient(135deg, #0f1a2e, #1a2e4a);
+      --input-bg: #1e2938;
+      --input-border: #334155;
     }
+
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
       background: var(--bg-dark);
       color: var(--text-light);
-      font-family: "Segoe UI", sans-serif;
+      font-family: "Segoe UI", system-ui, sans-serif;
       line-height: 1.6;
+      min-height: 100vh;
     }
 
     header {
-      padding: 3rem 1.5rem;
+      position: relative;
+      padding: 6rem 1.5rem 4rem;
       text-align: center;
-      background: linear-gradient(180deg, #121212, #0e0e0e);
+      background: var(--gradient), url('https://images.unsplash.com/photo-1543351611-58f69d7c1781?auto=format&fit=crop&q=80&w=1974') center/cover no-repeat;
+      background-blend-mode: overlay;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 30% 20%, rgba(0,255,170,0.08), transparent 60%);
+      pointer-events: none;
+    }
+
+    .header-content {
+      max-width: 900px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
     }
 
     header h1 {
       color: var(--accent);
-      font-size: 2.2rem;
-      margin-bottom: 0.5rem;
+      font-size: clamp(2.8rem, 8vw, 4.8rem);
+      margin: 0 0 0.8rem;
+      font-weight: 800;
+      text-shadow: 0 0 30px var(--accent-glow);
+      letter-spacing: -1px;
     }
 
     header p {
-      max-width: 700px;
-      margin: auto;
+      font-size: clamp(1.1rem, 3.2vw, 1.3rem);
       color: var(--text-muted);
-      font-size: 1rem;
+      margin: 0 0 2rem;
     }
 
-    section {
-      padding: 2.5rem 1.5rem;
-      max-width: 1000px;
-      margin: auto;
+    .cta-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.2rem;
     }
+
+    .btn {
+      padding: 0.9rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 50px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0a0e14;
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px var(--accent-glow);
+      background: #00e699;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-outline:hover {
+      background: var(--accent);
+      color: #0a0e14;
+      transform: translateY(-3px);
+    }
+
+    section { padding: 4rem 1.5rem; max-width: 1100px; margin: auto; }
 
     h2 {
       color: var(--accent);
-      margin-bottom: 1rem;
+      font-size: clamp(1.8rem, 5vw, 2.6rem);
+      margin: 0 0 1.8rem;
+      text-align: center;
+      position: relative;
     }
 
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem;
+    h2::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background: var(--accent);
+      border-radius: 3px;
+      opacity: 0.6;
     }
+
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
 
     .feature-card {
       background: var(--card-bg);
-      padding: 1.2rem;
-      border-radius: 12px;
+      padding: 1.8rem 1.5rem;
+      border-radius: 16px;
+      border: 1px solid #222c38;
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeUp 0.8s forwards;
     }
 
-    .feature-card h3 {
-      margin-top: 0;
-      font-size: 1rem;
-      color: var(--accent);
+    .feature-card:nth-child(1) { animation-delay: 0.1s; }
+    .feature-card:nth-child(2) { animation-delay: 0.2s; }
+    .feature-card:nth-child(3) { animation-delay: 0.3s; }
+    .feature-card:nth-child(4) { animation-delay: 0.4s; }
+
+    @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+    .feature-card:hover {
+      transform: translateY(-10px) scale(1.03);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 0 1px var(--accent-glow);
+      border-color: var(--accent);
     }
 
-    .fixtures-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1rem;
-      margin-top: 1rem;
-    }
+    .feature-card h3 { margin: 0 0 1rem; font-size: 1.3rem; color: var(--accent); display: flex; align-items: center; gap: 0.6rem; }
+
+    .feature-card i { font-size: 1.4rem; }
+
+    .fixtures-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.6rem; margin-top: 2rem; }
 
     .fixture-card {
       background: var(--card-bg);
-      border-radius: 12px;
-      padding: 1rem;
+      border-radius: 16px;
+      padding: 1.6rem;
+      border: 1px solid #222c38;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fixture-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.45);
+      border-color: var(--accent);
     }
 
     .fixture-names {
-      font-weight: bold;
-      margin-bottom: 0.5rem;
+      font-weight: 700;
+      font-size: 1.3rem;
+      margin-bottom: 1.2rem;
       text-align: center;
+      color: #e0f0ff;
+      background: rgba(0,0,0,0.3);
+      padding: 0.6rem;
+      border-radius: 10px;
     }
 
     .risk-row {
       display: flex;
       justify-content: space-between;
-      font-size: 0.9rem;
-      margin: 0.3rem 0;
+      align-items: center;
+      font-size: 1rem;
+      margin: 0.7rem 0;
+      padding: 0.5rem 0.8rem;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.03);
     }
 
-    .risk.low { color: var(--low); }
-    .risk.medium { color: var(--medium); }
-    .risk.high { color: var(--high); }
+    .risk {
+      font-weight: 600;
+      padding: 0.35rem 0.9rem;
+      border-radius: 20px;
+      min-width: 110px;
+      text-align: center;
+    }
+
+    .risk.low  { background: rgba(0,255,170,0.15); color: var(--low);  }
+    .risk.medium { background: rgba(255,170,51,0.15); color: var(--medium); }
+    .risk.high  { background: rgba(255,77,77,0.15);  color: var(--high);   }
+
+    .subscribe-section {
+      background: var(--card-bg);
+      padding: 3rem 2rem;
+      border-radius: 16px;
+      margin: 3rem auto;
+      max-width: 700px;
+      text-align: center;
+      border: 1px solid var(--input-border);
+    }
+
+    .subscribe-section h3 {
+      color: var(--accent);
+      margin-bottom: 1rem;
+      font-size: 1.6rem;
+    }
+
+    .subscribe-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    @media (min-width: 500px) {
+      .subscribe-form { flex-direction: row; }
+    }
+
+    .subscribe-form input {
+      flex: 1;
+      padding: 0.9rem 1.2rem;
+      font-size: 1rem;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 50px;
+      color: var(--text-light);
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .subscribe-form input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .subscribe-form input::placeholder { color: var(--text-muted); }
+
+    .loading { text-align: center; font-size: 1.2rem; color: var(--text-muted); padding: 3rem 0; }
 
     .samples-footer {
       text-align: center;
-      margin-top: 2rem;
-      font-size: 0.9rem;
+      margin: 3rem 0;
+      font-size: 1.1rem;
       color: var(--text-muted);
     }
 
-    .samples-footer a {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: bold;
-    }
+    .samples-footer a.btn { margin: 1rem; }
 
     footer {
-      padding: 1.5rem;
+      padding: 2.5rem 1.5rem;
       text-align: center;
-      font-size: 0.75rem;
+      font-size: 0.9rem;
       color: var(--text-muted);
-      border-top: 1px solid #222;
+      border-top: 1px solid #1e2a38;
+      background: #0c1219;
+    }
+
+    @media (max-width: 600px) {
+      header { padding: 5rem 1rem 3rem; }
+      section { padding: 3rem 1rem; }
+      .cta-buttons { flex-direction: column; }
     }
   </style>
 </head>
@@ -131,24 +300,30 @@
 <body>
 
 <header>
-  <h1>SafeGoals</h1>
-  <p>
-    A football intelligence platform designed to help users understand
-    <strong>goal risk</strong> before making decisions.
-    SafeGoals focuses on probability, context, and discipline — not hype.
-  </p>
+  <div class="header-content">
+    <h1>SafeGoals</h1>
+    <p>
+      A football intelligence platform designed to help users understand
+      <strong>goal risk</strong> before making decisions.<br>
+      Probability • Context • Discipline — no hype.
+    </p>
+
+    <div class="cta-buttons">
+      <a href="signup.html" class="btn btn-primary">Sign Up – Get Full Access</a>
+      <button class="btn btn-outline">Learn More</button>
+    </div>
+  </div>
 </header>
 
 <section>
   <h2>What is SafeGoals?</h2>
-  <p>
-    SafeGoals analyzes football matches using Goal Scoring Probability (GSP)
-    to classify games into <strong>Low, Medium, or High Risk</strong> for common
-    goal markets.
+  <p style="max-width:720px; margin:auto; text-align:center; font-size:1.1rem;">
+    SafeGoals analyzes matches using <strong>Goal Scoring Probability (GSP)</strong> — classifying games into 
+    <span style="color:var(--low)">Low</span>, 
+    <span style="color:var(--medium)">Medium</span>, or 
+    <span style="color:var(--high)">High</span> risk for popular goal markets.
     <br><br>
-    Instead of telling you what to bet on, SafeGoals helps you
-    <strong>avoid bad decisions</strong> by highlighting risk levels clearly
-    and transparently.
+    We don’t tell you <em>what</em> to play — we help you clearly see and <strong>avoid</strong> dangerous setups.
   </p>
 </section>
 
@@ -157,72 +332,67 @@
 
   <div class="features">
     <div class="feature-card">
-      <h3>Risk-First Analysis</h3>
-      <p>
-        Every match is evaluated based on historical goal tendencies,
-        not assumptions or hype.
-      </p>
+      <h3><i class="fas fa-shield-alt"></i> Risk-First Analysis</h3>
+      <p>Every match evaluated from historical goal patterns — never assumptions or narrative hype.</p>
     </div>
 
     <div class="feature-card">
-      <h3>Over 0.5 & Over 1.5 Focus</h3>
-      <p>
-        Clear risk breakdown for each team scoring and combined goal outcomes.
-      </p>
+      <h3><i class="fas fa-futbol"></i> Over 0.5 & Over 1.5 Focus</h3>
+      <p>Precise team-level and combined goal risk breakdown — easy to scan.</p>
     </div>
 
     <div class="feature-card">
-      <h3>Transparency</h3>
-      <p>
-        No “sure games”, no fake accuracy claims.
-        Just probabilities and structured analysis.
-      </p>
+      <h3><i class="fas fa-eye"></i> Radical Transparency</h3>
+      <p>No “locks”, no exaggerated win rates. Just honest probabilities + context.</p>
     </div>
 
     <div class="feature-card">
-      <h3>Decision Discipline</h3>
-      <p>
-        SafeGoals is built to help users pass risky games,
-        not chase every fixture.
-      </p>
+      <h3><i class="fas fa-brain"></i> Decision Discipline</h3>
+      <p>Built to help you confidently pass on risky fixtures — not chase every game.</p>
     </div>
   </div>
 </section>
 
 <section>
-  <h2>Samples</h2>
-  <p class="text-muted">
-    Below are sample match analyses available for free.
-    Full access includes more leagues, deeper insights, and historical data.
+  <h2>Sample Analyses</h2>
+  <p style="text-align:center; color:var(--text-muted); margin-bottom:2.5rem; font-size:1.1rem;">
+    Free preview matches below. Full access unlocks more leagues, deeper stats & history.
   </p>
 
   <div id="fixture-list" class="fixtures-grid">
-    Loading samples...
+    <div class="loading"><i class="fas fa-circle-notch fa-spin"></i> Loading recent samples...</div>
+  </div>
+
+  <div class="subscribe-section">
+    <h3>Subscribe for Updates & Early Access</h3>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
+      Get notified when new samples drop or when we launch premium features.
+    </p>
+    <form class="subscribe-form" onsubmit="alert('Subscribed! (Demo – add real backend later)'); return false;">
+      <input type="email" placeholder="Enter your email" required aria-label="Email for newsletter">
+      <button type="submit" class="btn btn-primary">Subscribe</button>
+    </form>
   </div>
 
   <div class="samples-footer">
-    <p>
-      Want full access to all fixtures and advanced insights?
-      <br>
-      <a href="data.html">View more →</a>
+    <p style="margin-bottom: 1.5rem;">
+      Ready for full database, live updates & advanced filters?
     </p>
+    <a href="signup.html" class="btn btn-primary">Sign Up Now</a>
+    <a href="#" class="btn btn-outline">Contact Us</a>
   </div>
 </section>
 
 <footer>
-  SafeGoals does not provide betting advice.
-  This platform is for analytical and informational purposes only.
+  SafeGoals provides analytical tools and information only.<br>
+  This platform does not offer betting advice or guarantees.
 </footer>
 
 <script>
   const SUPABASE_URL = "https://ccmsjcnuyrngqxwrswfe.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY";
 
-  const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
-
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   const fixtureList = document.getElementById("fixture-list");
 
   function teamRisk(gsp) {
@@ -239,53 +409,59 @@
   }
 
   async function loadSamples() {
-    const { data } = await supabaseClient
-      .from("fixtures")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(3);
+    try {
+      const { data, error } = await supabase
+        .from("fixtures")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(3);
 
-    if (!data || data.length === 0) {
-      fixtureList.innerHTML = "<p>No samples available.</p>";
-      return;
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        fixtureList.innerHTML = "<p style='grid-column:1/-1;text-align:center;'>No sample data available yet.</p>";
+        return;
+      }
+
+      fixtureList.innerHTML = data.map(f => {
+        const home = Number(f.home_gsp) || 0;
+        const away = Number(f.away_gsp) || 0;
+        const total = home + away;
+
+        const hRisk = teamRisk(home);
+        const aRisk = teamRisk(away);
+        const cRisk = combinedRisk(total);
+
+        return `
+          <div class="fixture-card">
+            <div class="fixture-names">
+              ${f.home_name} <span style="color:#888">vs</span> ${f.away_name}
+            </div>
+
+            <div class="risk-row">
+              <span>${f.home_name} (Over 0.5)</span>
+              <span class="risk ${hRisk.cls}">${hRisk.text}</span>
+            </div>
+
+            <div class="risk-row">
+              <span>${f.away_name} (Over 0.5)</span>
+              <span class="risk ${aRisk.cls}">${aRisk.text}</span>
+            </div>
+
+            <div class="risk-row">
+              <span>Over 1.5 Goals (Both Teams)</span>
+              <span class="risk ${cRisk.cls}">${cRisk.text}</span>
+            </div>
+          </div>
+        `;
+      }).join("");
+    } catch (err) {
+      fixtureList.innerHTML = "<p style='grid-column:1/-1;text-align:center;color:#ff4d4d;'>Error loading samples. Please try later.</p>";
     }
-
-    fixtureList.innerHTML = data.map(f => {
-      const home = Number(f.home_gsp) || 0;
-      const away = Number(f.away_gsp) || 0;
-      const total = home + away;
-
-      const hRisk = teamRisk(home);
-      const aRisk = teamRisk(away);
-      const cRisk = combinedRisk(total);
-
-      return `
-        <div class="fixture-card">
-          <div class="fixture-names">
-            ${f.home_name} vs ${f.away_name}
-          </div>
-
-          <div class="risk-row">
-            <span>${f.home_name} (O0.5)</span>
-            <span class="risk ${hRisk.cls}">${hRisk.text}</span>
-          </div>
-
-          <div class="risk-row">
-            <span>${f.away_name} (O0.5)</span>
-            <span class="risk ${aRisk.cls}">${aRisk.text}</span>
-          </div>
-
-          <div class="risk-row">
-            <span>Over 1.5 (Combined)</span>
-            <span class="risk ${cRisk.cls}">${cRisk.text}</span>
-          </div>
-        </div>
-      `;
-    }).join("");
   }
 
   loadSamples();
 </script>
 
 </body>
-</html>
+        </html>
