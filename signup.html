@@ -19,148 +19,156 @@
     .card {
       background: #151515;
       padding: 2rem;
-      width: 320px;
-      border-radius: 10px;
+      width: 340px;
+      border-radius: 12px;
       text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
     input {
       width: 100%;
-      padding: 0.7rem;
-      margin: 0.5rem 0;
-      border-radius: 6px;
+      padding: 0.9rem;
+      margin: 0.6rem 0;
+      border-radius: 8px;
       border: none;
-      background: #1f1f1f;
-      color: #fff;
+      background: #222;
+      color: white;
+      font-size: 1rem;
       box-sizing: border-box;
     }
     button {
       width: 100%;
-      padding: 0.7rem;
-      margin-top: 0.7rem;
+      padding: 0.9rem;
+      margin-top: 1rem;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       font-weight: bold;
+      font-size: 1.1rem;
       cursor: pointer;
     }
     .primary {
       background: #00ff99;
       color: #000;
     }
-    .google {
-      background: #fff;
-      color: #000;
-    }
-    .divider {
-      margin: 1.2rem 0;
-      color: #777;
-    }
     #msg {
-      margin-top: 0.8rem;
-      font-size: 0.9rem;
-      min-height: 1.2em;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+      min-height: 1.4em;
+    }
+
+    /* Success popup */
+    #successBox {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #00cc77;
+      color: #000;
+      padding: 2.5rem 4rem;
+      border-radius: 16px;
+      font-size: 1.6rem;
+      font-weight: bold;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+      z-index: 2000;
+      display: none;
+      text-align: center;
+      border: 3px solid #00ff99;
     }
   </style>
 </head>
-
 <body>
+
   <div class="card">
     <h2>Create SafeGoals Account</h2>
 
-    <input type="text"    id="username" placeholder="Username (3+ chars)" />
-    <input type="email"   id="email"    placeholder="Email" />
+    <input type="text"    id="username" placeholder="Username (3+ characters)" />
+    <input type="email"   id="email"    placeholder="Email address" />
     <input type="password" id="password" placeholder="Password" />
 
     <button class="primary" id="signupBtn">Sign Up</button>
 
-    <div class="divider">— OR —</div>
-
-    <button class="google" id="googleBtn">Continue with Google</button>
-
     <div id="msg"></div>
   </div>
+
+  <!-- Success popup -->
+  <div id="successBox">Registration successful!</div>
 
   <script type="module">
     import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js';
 
-    // ────────────────────────────────────────────────
-    // REPLACE THESE WITH YOUR ACTUAL VALUES
     const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    // ────────────────────────────────────────────────
 
-    const msgEl = document.getElementById("msg");
+    const msgEl = document.getElementById('msg');
+    const successBox = document.getElementById('successBox');
 
-    function showMessage(text, color = "#aaa") {
+    function showMessage(text, color = '#aaa') {
       msgEl.textContent = text;
       msgEl.style.color = color;
     }
 
-    // EMAIL + PASSWORD SIGNUP
-    document.getElementById("signupBtn").addEventListener("click", async () => {
-      const username = document.getElementById("username").value.trim();
-      const email    = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
+    document.getElementById('signupBtn').addEventListener('click', async () => {
+      const username = document.getElementById('username').value.trim();
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
 
       if (!username || !email || !password) {
-        showMessage("All fields are required.", "red");
+        showMessage('All fields are required.', 'red');
         return;
       }
 
       if (username.length < 3) {
-        showMessage("Username must be at least 3 characters.", "red");
+        showMessage('Username must be at least 3 characters.', 'red');
         return;
       }
 
-      showMessage("Creating account...", "#aaa");
+      showMessage('Creating account...', '#aaa');
 
       try {
-        const { data, error } = await supabase.auth.signUp({
+        // 1. Create auth user
+        const { data: authData, error: authError } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            data: { username }   // sent to user metadata → trigger creates profile row
+            data: { username }
           }
         });
 
-        if (error) throw error;
+        if (authError) throw authError;
 
-        showMessage("Account created! Check your email to confirm.", "#00ff99");
+        // 2. The trigger should have created the profile already
+        //    But we check if it exists to confirm success
+        const { data: profile, error: checkError } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('id', authData.user.id)
+          .single();
 
-        // Show success popup
-        alert("Account created successfully!\n\nPlease check your email to confirm your account.");
+        if (checkError || !profile) {
+          throw new Error('Profile was not created. Contact support.');
+        }
 
-        // Auto-redirect after 2 seconds (timer starts right after alert shows)
+        // Success!
+        showMessage('Account created! Check your email to confirm.', '#00ff99');
+        successBox.style.display = 'block';
+
         setTimeout(() => {
-          window.location.href = "login.html";
+          successBox.style.display = 'none';
+          window.location.href = 'login.html';
         }, 2000);
 
-      } catch (error) {
-        showMessage(error.message || "Something went wrong.", "red");
-        console.error("Sign-up error:", error);
-      }
-    });
+      } catch (err) {
+        console.error('Signup error:', err);
+        let msg = err.message || 'Something went wrong.';
 
-    // GOOGLE SIGN-IN / SIGN-UP
-    document.getElementById("googleBtn").addEventListener("click", async () => {
-      showMessage("Redirecting to Google...", "#aaa");
+        if (msg.includes('duplicate key')) msg = 'Username or email already taken.';
+        if (msg.includes('security')) msg = 'Permission issue – contact support.';
+        if (msg.includes('weak password')) msg = 'Password is too weak.';
 
-      try {
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider: "google",
-          options: {
-            redirectTo: window.location.origin + "/login.html"
-          }
-        });
-
-        if (error) throw error;
-
-      } catch (error) {
-        showMessage(error.message || "Google sign-in failed.", "red");
-        console.error("Google OAuth error:", error);
+        showMessage(msg, 'red');
       }
     });
   </script>
 </body>
-</html>
+  </html>
