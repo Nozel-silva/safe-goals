@@ -21,8 +21,6 @@
       --medium: #ffaa33;
       --high: #ff4d4d;
       --gradient: linear-gradient(135deg, #0f1a2e, #1a2e4a);
-      --input-bg: #1e2938;
-      --input-border: #334155;
     }
 
     * { box-sizing: border-box; }
@@ -38,7 +36,7 @@
 
     header {
       position: relative;
-      padding: 6rem 1.5rem 4rem;
+      padding: 7rem 1.5rem 5rem;
       text-align: center;
       background: var(--gradient), url('https://images.unsplash.com/photo-1543351611-58f69d7c1781?auto=format&fit=crop&q=80&w=1974') center/cover no-repeat;
       background-blend-mode: overlay;
@@ -62,67 +60,71 @@
 
     header h1 {
       color: var(--accent);
-      font-size: clamp(2.8rem, 8vw, 4.8rem);
-      margin: 0 0 0.8rem;
+      font-size: clamp(3rem, 9vw, 5rem);
+      margin: 0 0 1rem;
       font-weight: 800;
-      text-shadow: 0 0 30px var(--accent-glow);
-      letter-spacing: -1px;
+      text-shadow: 0 0 40px var(--accent-glow);
+      letter-spacing: -2px;
     }
 
     header p {
-      font-size: clamp(1.1rem, 3.2vw, 1.3rem);
+      font-size: clamp(1.15rem, 3.5vw, 1.35rem);
       color: var(--text-muted);
-      margin: 0 0 2rem;
+      margin: 0 0 2.5rem;
+      max-width: 780px;
     }
 
     .cta-buttons {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 1.2rem;
+      gap: 1.5rem;
     }
 
     .btn {
-      padding: 0.9rem 2rem;
-      font-size: 1.1rem;
+      padding: 1rem 2.4rem;
+      font-size: 1.15rem;
       font-weight: 600;
       border-radius: 50px;
       text-decoration: none;
-      transition: all 0.3s ease;
+      transition: all 0.35s ease;
       cursor: pointer;
       border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
     }
 
     .btn-primary {
       background: var(--accent);
       color: #0a0e14;
-      box-shadow: 0 0 20px var(--accent-glow);
+      box-shadow: 0 0 25px var(--accent-glow);
     }
 
     .btn-primary:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px var(--accent-glow);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 35px var(--accent-glow);
       background: #00e699;
     }
 
-    .btn-outline {
-      background: transparent;
-      border: 2px solid var(--accent);
-      color: var(--accent);
+    .btn-whatsapp {
+      background: #25D366;
+      color: white;
+      box-shadow: 0 0 20px rgba(37, 211, 102, 0.4);
     }
 
-    .btn-outline:hover {
-      background: var(--accent);
-      color: #0a0e14;
-      transform: translateY(-3px);
+    .btn-whatsapp:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 35px rgba(37, 211, 102, 0.6);
+      background: #20b358;
     }
 
-    section { padding: 4rem 1.5rem; max-width: 1100px; margin: auto; }
+    section { padding: 5rem 1.5rem; max-width: 1100px; margin: auto; }
 
     h2 {
       color: var(--accent);
-      font-size: clamp(1.8rem, 5vw, 2.6rem);
-      margin: 0 0 1.8rem;
+      font-size: clamp(2rem, 5.5vw, 2.8rem);
+      margin: 0 0 2rem;
       text-align: center;
       position: relative;
     }
@@ -130,169 +132,116 @@
     h2::after {
       content: '';
       position: absolute;
-      bottom: -10px;
+      bottom: -12px;
       left: 50%;
       transform: translateX(-50%);
-      width: 80px;
-      height: 3px;
+      width: 90px;
+      height: 4px;
       background: var(--accent);
-      border-radius: 3px;
+      border-radius: 4px;
       opacity: 0.6;
     }
 
-    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.8rem; }
 
     .feature-card {
       background: var(--card-bg);
-      padding: 1.8rem 1.5rem;
+      padding: 2rem 1.6rem;
       border-radius: 16px;
       border: 1px solid #222c38;
-      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
       opacity: 0;
-      transform: translateY(30px);
-      animation: fadeUp 0.8s forwards;
+      transform: translateY(40px);
+      animation: fadeUp 1s forwards;
     }
 
-    .feature-card:nth-child(1) { animation-delay: 0.1s; }
-    .feature-card:nth-child(2) { animation-delay: 0.2s; }
-    .feature-card:nth-child(3) { animation-delay: 0.3s; }
-    .feature-card:nth-child(4) { animation-delay: 0.4s; }
+    .feature-card:nth-child(1) { animation-delay: 0.15s; }
+    .feature-card:nth-child(2) { animation-delay: 0.3s; }
+    .feature-card:nth-child(3) { animation-delay: 0.45s; }
+    .feature-card:nth-child(4) { animation-delay: 0.6s; }
 
     @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
 
     .feature-card:hover {
-      transform: translateY(-10px) scale(1.03);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 0 1px var(--accent-glow);
+      transform: translateY(-12px) scale(1.04);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.45), 0 0 0 2px var(--accent-glow);
       border-color: var(--accent);
     }
 
-    .feature-card h3 { margin: 0 0 1rem; font-size: 1.3rem; color: var(--accent); display: flex; align-items: center; gap: 0.6rem; }
+    .feature-card h3 { margin: 0 0 1.2rem; font-size: 1.4rem; color: var(--accent); display: flex; align-items: center; gap: 0.8rem; }
 
-    .feature-card i { font-size: 1.4rem; }
+    .feature-card i { font-size: 1.5rem; }
 
-    .fixtures-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.6rem; margin-top: 2rem; }
+    .fixtures-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 2rem; margin-top: 2.5rem; }
 
     .fixture-card {
       background: var(--card-bg);
       border-radius: 16px;
-      padding: 1.6rem;
+      padding: 1.8rem;
       border: 1px solid #222c38;
       transition: all 0.4s ease;
-      position: relative;
-      overflow: hidden;
     }
 
     .fixture-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 25px 50px rgba(0,0,0,0.45);
+      transform: translateY(-10px);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
       border-color: var(--accent);
     }
 
     .fixture-names {
       font-weight: 700;
-      font-size: 1.3rem;
-      margin-bottom: 1.2rem;
+      font-size: 1.4rem;
+      margin-bottom: 1.4rem;
       text-align: center;
       color: #e0f0ff;
-      background: rgba(0,0,0,0.3);
-      padding: 0.6rem;
-      border-radius: 10px;
+      background: rgba(0,0,0,0.35);
+      padding: 0.8rem;
+      border-radius: 12px;
     }
 
     .risk-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 1rem;
-      margin: 0.7rem 0;
-      padding: 0.5rem 0.8rem;
-      border-radius: 8px;
-      background: rgba(255,255,255,0.03);
+      font-size: 1.05rem;
+      margin: 0.8rem 0;
+      padding: 0.6rem 1rem;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.04);
     }
 
     .risk {
       font-weight: 600;
-      padding: 0.35rem 0.9rem;
-      border-radius: 20px;
-      min-width: 110px;
+      padding: 0.4rem 1rem;
+      border-radius: 24px;
+      min-width: 120px;
       text-align: center;
     }
 
-    .risk.low  { background: rgba(0,255,170,0.15); color: var(--low);  }
-    .risk.medium { background: rgba(255,170,51,0.15); color: var(--medium); }
-    .risk.high  { background: rgba(255,77,77,0.15);  color: var(--high);   }
-
-    .subscribe-section {
-      background: var(--card-bg);
-      padding: 3rem 2rem;
-      border-radius: 16px;
-      margin: 3rem auto;
-      max-width: 700px;
-      text-align: center;
-      border: 1px solid var(--input-border);
-    }
-
-    .subscribe-section h3 {
-      color: var(--accent);
-      margin-bottom: 1rem;
-      font-size: 1.6rem;
-    }
-
-    .subscribe-form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      max-width: 500px;
-      margin: 0 auto;
-    }
-
-    @media (min-width: 500px) {
-      .subscribe-form { flex-direction: row; }
-    }
-
-    .subscribe-form input {
-      flex: 1;
-      padding: 0.9rem 1.2rem;
-      font-size: 1rem;
-      background: var(--input-bg);
-      border: 1px solid var(--input-border);
-      border-radius: 50px;
-      color: var(--text-light);
-      outline: none;
-      transition: all 0.3s;
-    }
-
-    .subscribe-form input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-glow);
-    }
-
-    .subscribe-form input::placeholder { color: var(--text-muted); }
-
-    .loading { text-align: center; font-size: 1.2rem; color: var(--text-muted); padding: 3rem 0; }
+    .risk.low  { background: rgba(0,255,170,0.18); color: var(--low);  }
+    .risk.medium { background: rgba(255,170,51,0.18); color: var(--medium); }
+    .risk.high  { background: rgba(255,77,77,0.18);  color: var(--high);   }
 
     .samples-footer {
       text-align: center;
-      margin: 3rem 0;
-      font-size: 1.1rem;
+      margin: 4rem 0 2rem;
+      font-size: 1.15rem;
       color: var(--text-muted);
     }
 
-    .samples-footer a.btn { margin: 1rem; }
-
     footer {
-      padding: 2.5rem 1.5rem;
+      padding: 3rem 1.5rem;
       text-align: center;
-      font-size: 0.9rem;
+      font-size: 0.95rem;
       color: var(--text-muted);
       border-top: 1px solid #1e2a38;
       background: #0c1219;
     }
 
     @media (max-width: 600px) {
-      header { padding: 5rem 1rem 3rem; }
-      section { padding: 3rem 1rem; }
-      .cta-buttons { flex-direction: column; }
+      header { padding: 5rem 1rem 3.5rem; }
+      section { padding: 4rem 1rem; }
+      .cta-buttons { flex-direction: column; gap: 1.2rem; }
     }
   </style>
 </head>
@@ -303,27 +252,31 @@
   <div class="header-content">
     <h1>SafeGoals</h1>
     <p>
-      A football intelligence platform designed to help users understand
-      <strong>goal risk</strong> before making decisions.<br>
-      Probability • Context • Discipline — no hype.
+      Football intelligence platform helping you understand <strong>goal risk</strong> before decisions.<br>
+      Built on probability, context, and discipline — never hype.
     </p>
 
     <div class="cta-buttons">
-      <a href="signup.html" class="btn btn-primary">Sign Up – Get Full Access</a>
-      <button class="btn btn-outline">Learn More</button>
+      <a href="signup.html" class="btn btn-primary">
+        <i class="fas fa-user-plus"></i> Sign Up – Get Full Access
+      </a>
+      <a href="https://wa.me/2349016501345?text=Hello%20SafeGoals%2C%20I%27m%20interested%20in%20your%20platform" 
+         target="_blank" 
+         class="btn btn-whatsapp">
+        <i class="fab fa-whatsapp"></i> Contact Us on WhatsApp
+      </a>
     </div>
   </div>
 </header>
 
 <section>
   <h2>What is SafeGoals?</h2>
-  <p style="max-width:720px; margin:auto; text-align:center; font-size:1.1rem;">
-    SafeGoals analyzes matches using <strong>Goal Scoring Probability (GSP)</strong> — classifying games into 
+  <p style="max-width:760px; margin:auto; text-align:center; font-size:1.15rem;">
+    SafeGoals uses <strong>Goal Scoring Probability (GSP)</strong> to classify matches into 
     <span style="color:var(--low)">Low</span>, 
     <span style="color:var(--medium)">Medium</span>, or 
-    <span style="color:var(--high)">High</span> risk for popular goal markets.
-    <br><br>
-    We don’t tell you <em>what</em> to play — we help you clearly see and <strong>avoid</strong> dangerous setups.
+    <span style="color:var(--high)">High</span> risk for common goal markets (Over 0.5 / Over 1.5).<br><br>
+    We help you spot and avoid bad setups — not chase every game.
   </p>
 </section>
 
@@ -332,60 +285,47 @@
 
   <div class="features">
     <div class="feature-card">
-      <h3><i class="fas fa-shield-alt"></i> Risk-First Analysis</h3>
-      <p>Every match evaluated from historical goal patterns — never assumptions or narrative hype.</p>
+      <h3><i class="fas fa-shield-alt"></i> Risk-First Mindset</h3>
+      <p>Matches evaluated purely on historical goal data — no narratives, no bias.</p>
     </div>
 
     <div class="feature-card">
-      <h3><i class="fas fa-futbol"></i> Over 0.5 & Over 1.5 Focus</h3>
-      <p>Precise team-level and combined goal risk breakdown — easy to scan.</p>
+      <h3><i class="fas fa-futbol"></i> Over 0.5 & Over 1.5 Clarity</h3>
+      <p>Team-by-team + combined risk levels — instantly understandable.</p>
     </div>
 
     <div class="feature-card">
-      <h3><i class="fas fa-eye"></i> Radical Transparency</h3>
-      <p>No “locks”, no exaggerated win rates. Just honest probabilities + context.</p>
+      <h3><i class="fas fa-eye"></i> Full Transparency</h3>
+      <p>No fake "sure wins" or clickbait. Just clear probabilities and logic.</p>
     </div>
 
     <div class="feature-card">
-      <h3><i class="fas fa-brain"></i> Decision Discipline</h3>
-      <p>Built to help you confidently pass on risky fixtures — not chase every game.</p>
+      <h3><i class="fas fa-brain"></i> Built for Discipline</h3>
+      <p>Designed to help you skip risky fixtures with confidence.</p>
     </div>
   </div>
 </section>
 
 <section>
   <h2>Sample Analyses</h2>
-  <p style="text-align:center; color:var(--text-muted); margin-bottom:2.5rem; font-size:1.1rem;">
-    Free preview matches below. Full access unlocks more leagues, deeper stats & history.
+  <p style="text-align:center; color:var(--text-muted); margin-bottom:3rem; font-size:1.15rem;">
+    Free preview of recent matches. Full access includes more leagues, deeper data & history.
   </p>
 
   <div id="fixture-list" class="fixtures-grid">
-    <div class="loading"><i class="fas fa-circle-notch fa-spin"></i> Loading recent samples...</div>
-  </div>
-
-  <div class="subscribe-section">
-    <h3>Subscribe for Updates & Early Access</h3>
-    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">
-      Get notified when new samples drop or when we launch premium features.
-    </p>
-    <form class="subscribe-form" onsubmit="alert('Subscribed! (Demo – add real backend later)'); return false;">
-      <input type="email" placeholder="Enter your email" required aria-label="Email for newsletter">
-      <button type="submit" class="btn btn-primary">Subscribe</button>
-    </form>
+    <div class="loading" style="grid-column:1/-1; text-align:center; font-size:1.3rem; padding:4rem 0;">
+      <i class="fas fa-circle-notch fa-spin"></i> Loading samples...
+    </div>
   </div>
 
   <div class="samples-footer">
-    <p style="margin-bottom: 1.5rem;">
-      Ready for full database, live updates & advanced filters?
-    </p>
-    <a href="signup.html" class="btn btn-primary">Sign Up Now</a>
-    <a href="#" class="btn btn-outline">Contact Us</a>
+    Want full access, more fixtures and advanced insights?
   </div>
 </section>
 
 <footer>
-  SafeGoals provides analytical tools and information only.<br>
-  This platform does not offer betting advice or guarantees.
+  SafeGoals is an analytical tool only.<br>
+  No betting advice or outcome guarantees are provided.
 </footer>
 
 <script>
@@ -419,7 +359,7 @@
       if (error) throw error;
 
       if (!data || data.length === 0) {
-        fixtureList.innerHTML = "<p style='grid-column:1/-1;text-align:center;'>No sample data available yet.</p>";
+        fixtureList.innerHTML = "<p style='grid-column:1/-1;text-align:center;'>No samples available yet.</p>";
         return;
       }
 
@@ -449,14 +389,14 @@
             </div>
 
             <div class="risk-row">
-              <span>Over 1.5 Goals (Both Teams)</span>
+              <span>Over 1.5 Goals (Combined)</span>
               <span class="risk ${cRisk.cls}">${cRisk.text}</span>
             </div>
           </div>
         `;
       }).join("");
     } catch (err) {
-      fixtureList.innerHTML = "<p style='grid-column:1/-1;text-align:center;color:#ff4d4d;'>Error loading samples. Please try later.</p>";
+      fixtureList.innerHTML = "<p style='grid-column:1/-1;text-align:center;color:#ff4d4d;'>Error loading samples.</p>";
     }
   }
 
@@ -464,4 +404,4 @@
 </script>
 
 </body>
-        </html>
+</html>
