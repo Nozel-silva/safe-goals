@@ -5,9 +5,6 @@
   <title>SafeGoals – Sign Up</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Supabase v2 -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-
   <style>
     body {
       background: #0f0f0f;
@@ -82,12 +79,16 @@
     <div id="msg"></div>
   </div>
 
-  <script>
-const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
+  <script type="module">
+    import { createClient } from 'https://cdn.skypack.dev/@supabase/supabase-js';
 
+    // ────────────────────────────────────────────────
+    // REPLACE THESE WITH YOUR ACTUAL VALUES
+    const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // ────────────────────────────────────────────────
 
     const msgEl = document.getElementById("msg");
 
@@ -96,7 +97,7 @@ const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
       msgEl.style.color = color;
     }
 
-    // ---------------- EMAIL + PASSWORD SIGNUP ----------------
+    // EMAIL + PASSWORD SIGNUP
     document.getElementById("signupBtn").addEventListener("click", async () => {
       const username = document.getElementById("username").value.trim();
       const email    = document.getElementById("email").value.trim();
@@ -114,45 +115,50 @@ const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
 
       showMessage("Creating account...", "#aaa");
 
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { username }   // goes to metadata → trigger creates profile
-        }
-      });
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { username }   // sent to user metadata → trigger creates profile row
+          }
+        });
 
-      if (error) {
-        showMessage(error.message, "red");
-        console.error(error);
-        return;
+        if (error) throw error;
+
+        showMessage("Account created! Check your email to confirm.", "#00ff99");
+
+        // Show success popup
+        alert("Account created successfully!\n\nPlease check your email to confirm your account.");
+
+        // Auto-redirect after 2 seconds (timer starts right after alert shows)
+        setTimeout(() => {
+          window.location.href = "login.html";
+        }, 2000);
+
+      } catch (error) {
+        showMessage(error.message || "Something went wrong.", "red");
+        console.error("Sign-up error:", error);
       }
-
-      // Success
-      showMessage("Account created! Check your email to confirm.", "#00ff99");
-
-      // Show alert → then auto-redirect after ~2 seconds (timer starts when alert appears)
-      alert("Account created successfully!\n\nPlease check your email to confirm your account.");
-
-      setTimeout(() => {
-        window.location.href = "login.html";
-      }, 2000);
     });
 
-    // ---------------- GOOGLE SIGN-IN / SIGN-UP ----------------
+    // GOOGLE SIGN-IN / SIGN-UP
     document.getElementById("googleBtn").addEventListener("click", async () => {
       showMessage("Redirecting to Google...", "#aaa");
 
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: window.location.origin + "/login.html"
-        }
-      });
+      try {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: "google",
+          options: {
+            redirectTo: window.location.origin + "/login.html"
+          }
+        });
 
-      if (error) {
-        showMessage(error.message, "red");
-        console.error(error);
+        if (error) throw error;
+
+      } catch (error) {
+        showMessage(error.message || "Google sign-in failed.", "red");
+        console.error("Google OAuth error:", error);
       }
     });
   </script>
