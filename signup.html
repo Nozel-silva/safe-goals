@@ -84,7 +84,7 @@
     <input type="email"   id="email"    placeholder="Email address" />
     <input type="password" id="password" placeholder="Password" />
 
-    <button class="primary" id="signupBtn">Sign Up</button>
+    <button class="primary" onclick=" hey()" id="signupBtn">Sign Up</button>
 
     <div id="msg"></div>
   </div>
@@ -93,7 +93,11 @@
   <div id="successBox">Registration successful!</div>
 
   <!-- Link to the external JavaScript file -->
-  <script type="module" src="signup.js"></script>
+  <script src="signup.js">
+    function hey(){
+    alert(' wassup');
+    }
+  </script>
 
 </body>
 </html>
