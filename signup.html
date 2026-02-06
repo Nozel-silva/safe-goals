@@ -17,6 +17,7 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
     }
     .card {
       background: #151515;
@@ -33,6 +34,7 @@
       border: none;
       background: #1f1f1f;
       color: #fff;
+      box-sizing: border-box;
     }
     button {
       width: 100%;
@@ -52,12 +54,13 @@
       color: #000;
     }
     .divider {
-      margin: 1rem 0;
+      margin: 1.2rem 0;
       color: #777;
     }
     #msg {
       margin-top: 0.8rem;
       font-size: 0.9rem;
+      min-height: 1.2em;
     }
   </style>
 </head>
@@ -66,8 +69,8 @@
   <div class="card">
     <h2>Create SafeGoals Account</h2>
 
-    <input type="text" id="username" placeholder="Username" />
-    <input type="email" id="email" placeholder="Email" />
+    <input type="text"    id="username" placeholder="Username (3+ chars)" />
+    <input type="email"   id="email"    placeholder="Email" />
     <input type="password" id="password" placeholder="Password" />
 
     <button class="primary" id="signupBtn">Sign Up</button>
@@ -80,63 +83,77 @@
   </div>
 
   <script>
-    // 🔴 REPLACE WITH YOUR DETAILS
-    const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co";
-    const SUPABASE_ANON_KEY = "YOUR_ANON_KEY";
+const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
 
-    const supabase = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY
-    );
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
 
-    const msg = document.getElementById("msg");
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // EMAIL + PASSWORD SIGNUP
+    const msgEl = document.getElementById("msg");
+
+    function showMessage(text, color = "#aaa") {
+      msgEl.textContent = text;
+      msgEl.style.color = color;
+    }
+
+    // ---------------- EMAIL + PASSWORD SIGNUP ----------------
     document.getElementById("signupBtn").addEventListener("click", async () => {
       const username = document.getElementById("username").value.trim();
-      const email = document.getElementById("email").value.trim();
+      const email    = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value.trim();
 
       if (!username || !email || !password) {
-        msg.textContent = "All fields are required.";
-        msg.style.color = "red";
+        showMessage("All fields are required.", "red");
         return;
       }
+
+      if (username.length < 3) {
+        showMessage("Username must be at least 3 characters.", "red");
+        return;
+      }
+
+      showMessage("Creating account...", "#aaa");
 
       const { data, error } = await supabase.auth.signUp({
         email,
-        password
+        password,
+        options: {
+          data: { username }   // goes to metadata → trigger creates profile
+        }
       });
 
       if (error) {
-        msg.textContent = error.message;
-        msg.style.color = "red";
+        showMessage(error.message, "red");
+        console.error(error);
         return;
       }
 
-      // Insert into users table
-      await supabase.from("users").insert({
-        id: data.user.id,
-        username,
-        email
-      });
+      // Success
+      showMessage("Account created! Check your email to confirm.", "#00ff99");
 
-      msg.textContent = "Account created. Redirecting...";
-      msg.style.color = "#00ff99";
+      // Show alert → then auto-redirect after ~2 seconds (timer starts when alert appears)
+      alert("Account created successfully!\n\nPlease check your email to confirm your account.");
 
       setTimeout(() => {
         window.location.href = "login.html";
-      }, 1200);
+      }, 2000);
     });
 
-    // GOOGLE SIGNUP
+    // ---------------- GOOGLE SIGN-IN / SIGN-UP ----------------
     document.getElementById("googleBtn").addEventListener("click", async () => {
-      await supabase.auth.signInWithOAuth({
+      showMessage("Redirecting to Google...", "#aaa");
+
+      const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: window.location.origin + "/login.html"
         }
       });
+
+      if (error) {
+        showMessage(error.message, "red");
+        console.error(error);
+      }
     });
   </script>
 </body>
