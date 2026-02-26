@@ -6,82 +6,194 @@
   <title>SafeGoals – Risk Analysis</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --bg-dark: #0f0f0f;
-      --card-bg: #1a1a1a;
-      --text-light: #f5f5f5;
-      --text-muted: #aaa;
-      --low: #00ff99;
-      --medium: #ffb347;
-      --high: #ff4d4d;
+      --bg-dark: #0a0a0a;
+      --card-bg: #111111;
+      --card-border: #1e1e1e;
+      --text-light: #f0f0f0;
+      --text-muted: #666;
+      --low: #00e87a;
+      --medium: #f5a623;
+      --high: #ff3b3b;
+      --gold: #ffd700;
+      --gold-dim: #a08700;
     }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       background: var(--bg-dark);
       color: var(--text-light);
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 1.5rem;
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
     }
 
     header {
-      background: #121212;
-      padding: 1rem 1.5rem;
-      border-radius: 12px;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 0 10px rgba(0,255,153,0.15);
+      background: #0d0d0d;
+      border-bottom: 1px solid #1a1a1a;
+      padding: 1.2rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo { font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; color: var(--low); }
+    .logo span { color: var(--text-muted); font-weight: 400; }
+    .header-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      border: 1px solid #222;
+      padding: 0.3rem 0.75rem;
+      border-radius: 20px;
     }
 
-    header h2 {
-      margin: 0;
-      color: var(--low);
+    .container { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    .section-header { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1.2rem; }
+    .section-header h2 { font-size: 1rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+    .section-header .line { flex: 1; height: 1px; background: #1e1e1e; }
+    .badge-best {
+      background: linear-gradient(135deg, #3a2a00, #1a1200);
+      border: 1px solid var(--gold-dim);
+      color: var(--gold);
+      font-size: 0.7rem;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
     }
+    .badge-all {
+      background: #111;
+      border: 1px solid #222;
+      color: var(--text-muted);
+      font-size: 0.7rem;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+    }
+
+    #best-section { margin-bottom: 2.5rem; }
 
     .fixtures-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
       gap: 1rem;
     }
 
     .fixture-card {
       background: var(--card-bg);
-      border-radius: 12px;
-      padding: 1rem;
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 1.1rem;
+      transition: border-color 0.2s, transform 0.2s;
+      position: relative;
+      overflow: hidden;
+      animation: fadeIn 0.3s ease both;
+    }
+    .fixture-card:hover { border-color: #2a2a2a; transform: translateY(-2px); }
+
+    .fixture-card.best-card {
+      border-color: var(--gold-dim);
+      background: linear-gradient(160deg, #111200, #0f0e00, #0a0a0a);
+    }
+    .fixture-card.best-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+    .fixture-card.best-card:hover {
+      border-color: var(--gold);
+      box-shadow: 0 0 24px rgba(255,215,0,0.08);
+    }
+
+    .best-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: linear-gradient(135deg, #2a1f00, #1a1300);
+      border: 1px solid var(--gold-dim);
+      color: var(--gold);
+      font-size: 0.65rem;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 0.6rem;
+      letter-spacing: 0.05em;
     }
 
     .fixture-names {
-      font-size: 1.1rem;
-      font-weight: bold;
-      margin-bottom: 0.8rem;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.9rem;
       text-align: center;
+      letter-spacing: -0.3px;
+      line-height: 1.3;
     }
+    .vs { color: var(--text-muted); font-weight: 400; font-size: 0.85rem; margin: 0 0.3rem; }
 
     .risk-row {
       display: flex;
       justify-content: space-between;
-      margin: 0.4rem 0;
-      font-size: 0.9rem;
+      align-items: center;
+      margin: 0.35rem 0;
     }
+    .team-name {
+      color: #ccc;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+    }
+    .risk-label {
+      font-weight: 700;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 0.18rem 0.55rem;
+      border-radius: 4px;
+    }
+    .risk-label.low    { color: var(--low);    background: rgba(0,232,122,0.08); }
+    .risk-label.medium { color: var(--medium); background: rgba(245,166,35,0.08); }
+    .risk-label.high   { color: var(--high);   background: rgba(255,59,59,0.08); }
 
-    .risk-label.low { color: var(--low); }
-    .risk-label.medium { color: var(--medium); }
-    .risk-label.high { color: var(--high); }
+    .card-divider { border: none; border-top: 1px solid #1e1e1e; margin: 0.7rem 0 0.5rem; }
 
-    .section-title {
-      margin-top: 0.8rem;
-      font-size: 0.85rem;
+    .combined-row { display: flex; justify-content: space-between; align-items: center; }
+    .combined-label { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-muted); }
+
+    .sub-label {
+      font-size: 0.68rem;
+      font-family: 'JetBrains Mono', monospace;
       color: var(--text-muted);
-      border-bottom: 1px solid #333;
-      padding-bottom: 0.3rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.3rem;
     }
 
     .uploaded-time {
       margin-top: 0.8rem;
-      font-size: 0.75rem;
-      color: var(--text-muted);
+      font-size: 0.68rem;
+      color: #333;
+      text-align: right;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .empty-state {
+      grid-column: 1/-1;
       text-align: center;
+      padding: 3rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
@@ -89,85 +201,115 @@
 <body>
 
 <header>
-  <h2>SafeGoals – Goal Risk Analysis</h2>
+  <div class="logo">Safe<span>Goals</span></div>
+  <div class="header-badge">Goal Risk Analysis</div>
 </header>
 
-<div id="fixture-list" class="fixtures-grid">Loading fixtures...</div>
+<div class="container">
+
+  <!-- BEST PICKS -->
+  <div id="best-section">
+    <div class="section-header">
+      <h2 style="color: var(--gold);">⭐ Best Picks</h2>
+      <div class="badge-best">GSP &gt; 60%</div>
+      <div class="line"></div>
+    </div>
+    <div id="best-list" class="fixtures-grid">
+      <div class="empty-state">Loading best picks...</div>
+    </div>
+  </div>
+
+  <!-- ALL FIXTURES -->
+  <div>
+    <div class="section-header">
+      <h2>All Fixtures</h2>
+      <div class="badge-all">All Markets</div>
+      <div class="line"></div>
+    </div>
+    <div id="fixture-list" class="fixtures-grid">
+      <div class="empty-state">Loading fixtures...</div>
+    </div>
+  </div>
+
+</div>
 
 <script>
   const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
-
-  const supabaseClient = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
-
-  const fixtureList = document.getElementById('fixture-list');
+  const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   function getTeamRisk(gsp) {
-    if (gsp < 50) return { text: "High Risk", class: "high" };
-    if (gsp >= 55 && gsp <= 60) return { text: "Medium Risk", class: "medium" };
-    if (gsp >= 61 && gsp <= 90) return { text: "Low Risk", class: "low" };
-    return { text: "Unclear", class: "" };
+    if (gsp < 50)               return { text: "High Risk",   cls: "high"   };
+    if (gsp >= 55 && gsp <= 60) return { text: "Medium Risk", cls: "medium" };
+    if (gsp >= 61 && gsp <= 90) return { text: "Low Risk",    cls: "low"    };
+    return                             { text: "Unclear",     cls: ""       };
   }
 
   function getCombinedRisk(sum) {
-    if (sum >= 140) return { text: "Low Risk", class: "low" };
-    if (sum >= 100) return { text: "Medium Risk", class: "medium" };
-    return { text: "High Risk", class: "high" };
+    if (sum >= 140) return { text: "Low Risk",    cls: "low"    };
+    if (sum >= 100) return { text: "Medium Risk", cls: "medium" };
+    return                 { text: "High Risk",   cls: "high"   };
+  }
+
+  function renderCard(f, isBest = false, index = 0) {
+    const home = Number(f.home_gsp) || 0;
+    const away = Number(f.away_gsp) || 0;
+    const combined = home + away;
+    const homeRisk     = getTeamRisk(home);
+    const awayRisk     = getTeamRisk(away);
+    const combinedRisk = getCombinedRisk(combined);
+
+    return `
+      <div class="fixture-card ${isBest ? 'best-card' : ''}" style="animation-delay:${index * 0.05}s">
+        ${isBest ? `<div class="best-tag">⭐ BEST PICK</div>` : ''}
+        <div class="fixture-names">
+          ${f.home_name} <span class="vs">vs</span> ${f.away_name}
+        </div>
+
+        <div class="sub-label">Over 0.5 Goal – Per Team</div>
+        <div class="risk-row">
+          <span class="team-name">${f.home_name} (${home}%)</span>
+          <span class="risk-label ${homeRisk.cls}">${homeRisk.text}</span>
+        </div>
+        <div class="risk-row">
+          <span class="team-name">${f.away_name} (${away}%)</span>
+          <span class="risk-label ${awayRisk.cls}">${awayRisk.text}</span>
+        </div>
+
+        <hr class="card-divider"/>
+        <div class="sub-label">Over 1.5 Goals – Combined</div>
+        <div class="combined-row">
+          <span class="combined-label">Total GSP (${combined}%)</span>
+          <span class="risk-label ${combinedRisk.cls}">${combinedRisk.text}</span>
+        </div>
+
+        <div class="uploaded-time">${new Date(f.created_at).toLocaleString()}</div>
+      </div>
+    `;
   }
 
   async function loadFixtures() {
-    const { data } = await supabaseClient
+    const { data, error } = await supabaseClient
       .from('fixtures')
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (!data || data.length === 0) {
-      fixtureList.innerHTML = '<p>No fixtures found.</p>';
+    const bestList    = document.getElementById('best-list');
+    const fixtureList = document.getElementById('fixture-list');
+
+    if (error || !data || data.length === 0) {
+      bestList.innerHTML    = '<div class="empty-state">No best picks available.</div>';
+      fixtureList.innerHTML = '<div class="empty-state">No fixtures found.</div>';
       return;
     }
 
-    fixtureList.innerHTML = data.map(f => {
-      const home = Number(f.home_gsp) || 0;
-      const away = Number(f.away_gsp) || 0;
-      const combined = home + away;
+    const best = data.filter(f => Number(f.home_gsp) > 60 && Number(f.away_gsp) > 60);
 
-      const homeRisk = getTeamRisk(home);
-      const awayRisk = getTeamRisk(away);
-      const combinedRisk = getCombinedRisk(combined);
+    bestList.innerHTML = best.length
+      ? best.map((f, i) => renderCard(f, true, i)).join('')
+      : '<div class="empty-state">No fixtures with GSP &gt; 60% on both sides right now.</div>';
 
-      return `
-        <div class="fixture-card">
-          <div class="fixture-names">
-            ${f.home_name} vs ${f.away_name}
-          </div>
-
-          <div class="section-title">Over 0.5 Goal (Per Team)</div>
-          <div class="risk-row">
-            <span>${f.home_name} (${home}%)</span>
-            <span class="risk-label ${homeRisk.class}">${homeRisk.text}</span>
-          </div>
-          <div class="risk-row">
-            <span>${f.away_name} (${away}%)</span>
-            <span class="risk-label ${awayRisk.class}">${awayRisk.text}</span>
-          </div>
-
-          <div class="section-title">Over 1.5 Goals (Combined)</div>
-          <div class="risk-row">
-            <span>Total GSP (${combined}%)</span>
-            <span class="risk-label ${combinedRisk.class}">
-              ${combinedRisk.text}
-            </span>
-          </div>
-
-          <div class="uploaded-time">
-              Uploaded:${new Date(f.created_at).toLocaleString()}
-           </div>
-        </div>
-      `;
-    }).join('');
+    fixtureList.innerHTML = data.map((f, i) => renderCard(f, false, i)).join('');
   }
 
   loadFixtures();
