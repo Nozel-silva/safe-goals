@@ -20,7 +20,6 @@
       --low: #00e87a;
       --medium: #f5a623;
       --high: #ff3b3b;
-      --green-glow: rgba(0,232,122,0.1);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -63,21 +62,9 @@
       align-items: center;
       gap: 0.4rem;
     }
-    .nav-btn.outline {
-      background: transparent;
-      border: 1px solid #222;
-      color: var(--muted2);
-    }
-    .nav-btn.outline:hover { border-color: var(--low); color: var(--low); }
-    .nav-btn.solid {
-      background: var(--low);
-      color: #000;
-    }
+    .nav-btn.solid { background: var(--low); color: #000; }
     .nav-btn.solid:hover { background: #00cc6a; transform: translateY(-1px); }
-    .nav-btn.whatsapp {
-      background: #25D366;
-      color: #fff;
-    }
+    .nav-btn.whatsapp { background: #25D366; color: #fff; }
     .nav-btn.whatsapp:hover { background: #1eb356; transform: translateY(-1px); }
 
     /* ── HERO ── */
@@ -127,7 +114,6 @@
       color: var(--text);
     }
     .hero h1 .green { color: var(--low); }
-
     .hero p {
       font-size: clamp(1rem, 2.5vw, 1.2rem);
       color: var(--muted2);
@@ -136,13 +122,7 @@
       line-height: 1.7;
     }
     .hero p strong { color: var(--text); font-weight: 600; }
-
-    .hero-cta {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.85rem;
-    }
+    .hero-cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.85rem; }
     .cta-btn {
       font-family: 'Syne', sans-serif;
       font-size: 0.95rem;
@@ -161,11 +141,7 @@
     .cta-primary:hover { background: #00cc6a; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,232,122,0.2); }
     .cta-wa { background: #25D366; color: #fff; }
     .cta-wa:hover { background: #1eb356; transform: translateY(-2px); }
-    .cta-ghost {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--muted2);
-    }
+    .cta-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted2); }
     .cta-ghost:hover { border-color: #333; color: var(--text); }
 
     /* ── STATS BAR ── */
@@ -176,7 +152,6 @@
       display: flex;
       justify-content: center;
       flex-wrap: wrap;
-      gap: 0;
     }
     .stat-item {
       padding: 1.5rem 3rem;
@@ -184,46 +159,14 @@
       border-right: 1px solid var(--border);
     }
     .stat-item:last-child { border-right: none; }
-    .stat-num {
-      font-size: 1.8rem;
-      font-weight: 800;
-      color: var(--low);
-      font-family: 'JetBrains Mono', monospace;
-      display: block;
-    }
-    .stat-label {
-      font-size: 0.72rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      font-family: 'JetBrains Mono', monospace;
-      margin-top: 0.2rem;
-      display: block;
-    }
+    .stat-num { font-size: 1.8rem; font-weight: 800; color: var(--low); font-family: 'JetBrains Mono', monospace; display: block; }
+    .stat-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-family: 'JetBrains Mono', monospace; margin-top: 0.2rem; display: block; }
 
     /* ── SECTIONS ── */
     .section { padding: 5rem 2rem; max-width: 1100px; margin: 0 auto; }
-    .section-label {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--low);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      margin-bottom: 0.8rem;
-    }
-    .section-title {
-      font-size: clamp(1.6rem, 4vw, 2.2rem);
-      font-weight: 800;
-      letter-spacing: -1px;
-      margin-bottom: 0.75rem;
-      color: var(--text);
-    }
-    .section-sub {
-      color: var(--muted2);
-      font-size: 1rem;
-      line-height: 1.7;
-      max-width: 560px;
-    }
+    .section-label { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--low); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.8rem; }
+    .section-title { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 800; letter-spacing: -1px; margin-bottom: 0.75rem; color: var(--text); }
+    .section-sub { color: var(--muted2); font-size: 1rem; line-height: 1.7; max-width: 560px; }
 
     /* ── HOW IT WORKS ── */
     .how-grid {
@@ -236,55 +179,31 @@
       overflow: hidden;
       margin-top: 3rem;
     }
-    .how-item {
-      background: var(--card);
-      padding: 2rem 1.8rem;
-      transition: background 0.2s;
-    }
+    .how-item { background: var(--card); padding: 2rem 1.8rem; transition: background 0.2s; }
     .how-item:hover { background: #151515; }
-    .how-num {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--muted);
-      letter-spacing: 0.1em;
-      margin-bottom: 1rem;
-    }
+    .how-num { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.1em; margin-bottom: 1rem; }
     .how-icon {
       width: 40px; height: 40px;
       background: rgba(0,232,122,0.08);
       border: 1px solid rgba(0,232,122,0.15);
       border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--low);
-      font-size: 1rem;
-      margin-bottom: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--low); font-size: 1rem; margin-bottom: 1rem;
     }
     .how-item h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
     .how-item p { font-size: 0.85rem; color: var(--muted2); line-height: 1.6; }
 
-    /* ── RISK LEGEND ── */
-    .legend-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      margin-top: 3rem;
-    }
+    /* ── LEGEND ── */
+    .legend-row { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 3rem; }
     .legend-chip {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.7rem 1.2rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.78rem;
+      display: flex; align-items: center; gap: 0.5rem;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.7rem 1.2rem;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
     }
     .chip-dot { width: 8px; height: 8px; border-radius: 50%; }
 
-    /* ── SAMPLE FIXTURES ── */
+    /* ── FIXTURE CARDS ── */
     .fixtures-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -305,64 +224,32 @@
       to   { opacity: 1; transform: translateY(0); }
     }
     .fixture-teams {
-      font-size: 0.98rem;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 1rem;
-      padding-bottom: 0.8rem;
+      font-size: 0.98rem; font-weight: 700; text-align: center;
+      margin-bottom: 1rem; padding-bottom: 0.8rem;
       border-bottom: 1px solid var(--border);
     }
     .fixture-teams .vs { color: var(--muted); font-weight: 400; margin: 0 0.4rem; font-size: 0.85rem; }
     .sub-label {
-      font-size: 0.65rem;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin: 0.6rem 0 0.3rem;
+      font-size: 0.65rem; font-family: 'JetBrains Mono', monospace;
+      color: var(--muted); text-transform: uppercase;
+      letter-spacing: 0.08em; margin: 0.6rem 0 0.3rem;
     }
-    .risk-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 0.3rem 0;
-    }
-    .team-name {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.76rem;
-      color: #bbb;
-    }
+    .risk-row { display: flex; justify-content: space-between; align-items: center; margin: 0.3rem 0; }
+    .team-name { font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; color: #bbb; }
     .risk-pill {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.7rem;
-      font-weight: 700;
-      padding: 0.2rem 0.6rem;
-      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+      font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 4px;
     }
     .risk-pill.low    { color: var(--low);    background: rgba(0,232,122,0.08); }
     .risk-pill.medium { color: var(--medium); background: rgba(245,166,35,0.08); }
     .risk-pill.high   { color: var(--high);   background: rgba(255,59,59,0.08); }
     .card-divider { border: none; border-top: 1px solid var(--border); margin: 0.7rem 0 0.4rem; }
-    .combined-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .combined-label {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.72rem;
-      color: var(--muted2);
-    }
+    .combined-row { display: flex; justify-content: space-between; align-items: center; }
+    .combined-label { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--muted2); }
     .empty-state {
-      grid-column: 1/-1;
-      text-align: center;
-      padding: 3rem;
-      color: var(--muted);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
+      grid-column: 1/-1; text-align: center; padding: 3rem;
+      color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
     }
-    .spinner { animation: spin 1s linear infinite; display: inline-block; }
-    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ── CTA BANNER ── */
     .cta-banner {
@@ -382,21 +269,12 @@
       border-top: 1px solid var(--border);
       background: #0d0d0d;
       padding: 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 1rem;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
     }
     .footer-logo { font-size: 1rem; font-weight: 800; color: var(--low); }
     .footer-logo span { color: var(--muted); font-weight: 400; }
-    .footer-note {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.7rem;
-      color: var(--muted);
-      text-align: right;
-      line-height: 1.6;
-    }
+    .footer-note { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); text-align: right; line-height: 1.6; }
 
     @media (max-width: 640px) {
       .hero { padding: 5rem 1.2rem 4rem; }
@@ -500,7 +378,6 @@
     </div>
   </div>
 
-  <!-- Risk legend -->
   <div class="legend-row">
     <div class="legend-chip">
       <span class="chip-dot" style="background: var(--low)"></span>
@@ -527,9 +404,7 @@
   <div class="section-sub">A live look at recent fixtures run through the SafeGoals algorithm. Full access unlocks all fixtures, leagues, and history.</div>
 
   <div id="fixture-list" class="fixtures-grid">
-    <div class="empty-state">
-      <span class="spinner">⟳</span> Loading samples...
-    </div>
+    <div class="empty-state">Loading samples...</div>
   </div>
 
   <div class="cta-banner">
@@ -558,7 +433,9 @@
 <script>
   const SUPABASE_URL = "https://ccmsjcnuyrngqxwrswfe.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY";
-  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const { createClient } = window.supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   function teamRisk(gsp) {
     if (gsp < 50)               return { text: "High Risk",   cls: "high"   };
@@ -586,7 +463,6 @@
         <div class="fixture-teams">
           ${f.home_name} <span class="vs">vs</span> ${f.away_name}
         </div>
-
         <div class="sub-label">Over 0.5 Goal – Per Team</div>
         <div class="risk-row">
           <span class="team-name">${f.home_name} (${home}%)</span>
@@ -596,7 +472,6 @@
           <span class="team-name">${f.away_name} (${away}%)</span>
           <span class="risk-pill ${aRisk.cls}">${aRisk.text}</span>
         </div>
-
         <hr class="card-divider"/>
         <div class="sub-label">Over 1.5 Goals – Combined</div>
         <div class="combined-row">
@@ -609,154 +484,30 @@
 
   async function loadSamples() {
     const list = document.getElementById('fixture-list');
-    try {
-      const { data, error } = await sb
-        .from('fixtures')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(3);
 
-      if (error) throw error;
-      if (!data || data.length === 0) {
-        list.innerHTML = '<div class="empty-state">No samples available yet.</div>';
-        return;
-      }
-      list.innerHTML = data.map((f, i) => renderCard(f, i)).join('');
-    } catch {
-      list.innerHTML = '<div class="empty-state" style="color:var(--high)">Failed to load  (GSP)</strong> to classify matches into 
-    <span style="color:var(--low)">Low</span>, 
-    <span style="color:var(--medium)">Medium</span>, or 
-    <span style="color:var(--high)">High</span> risk for common goal markets (Over 0.5 / Over 1.5).<br><br>
-    We help you spot and avoid bad setups — not chase every game.
-  </p>
-</section>
+    const { data, error } = await sb
+      .from('fixtures')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(5);
 
-<section>
-  <h2>How SafeGoals Helps</h2>
+    console.log('data:', data);
+    console.log('error:', error);
 
-  <div class="features">
-    <div class="feature-card">
-      <h3><i class="fas fa-shield-alt"></i> Risk-First Mindset</h3>
-      <p>Matches evaluated purely on historical goal data — no narratives, no bias.</p>
-    </div>
-
-    <div class="feature-card">
-      <h3><i class="fas fa-futbol"></i> Over 0.5 & Over 1.5 Clarity</h3>
-      <p>Team-by-team + combined risk levels — instantly understandable.</p>
-    </div>
-
-    <div class="feature-card">
-      <h3><i class="fas fa-eye"></i> Full Transparency</h3>
-      <p>No fake "sure wins" or clickbait. Just clear probabilities and logic.</p>
-    </div>
-
-    <div class="feature-card">
-      <h3><i class="fas fa-brain"></i> Built for Discipline</h3>
-      <p>Designed to help you skip risky fixtures with confidence.</p>
-    </div>
-  </div>
-</section>
-
-<section>
-  <h2>Sample Analyses</h2>
-  <p style="text-align:center; color:var(--text-muted); margin-bottom:3rem; font-size:1.15rem;">
-    Free preview of recent matches. Full access includes more leagues, deeper data & history.
-  </p>
-
-  <div id="fixture-list" class="fixtures-grid">
-    <div class="loading" style="grid-column:1/-1; text-align:center; font-size:1.3rem; padding:4rem 0;">
-      <i class="fas fa-circle-notch fa-spin"></i> Loading samples...
-    </div>
-  </div>
-
-  <div class="samples-footer">
-    Want full access, more fixtures and advanced insights?
-    <div class="samples-cta">
-      <a href="https://paystack.shop/pay/fqlm48nc1i" class="btn btn-primary">
-        <i class="fas fa-rocket"></i> Subscribe Now
-      </a>
-    </div>
-  </div>
-</section>
-
-<footer>
-  SafeGoals is an analytical tool only.<br>
-  No betting advice or outcome guarantees are provided.
-</footer>
-
-<script>
-  const SUPABASE_URL = "https://ccmsjcnuyrngqxwrswfe.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY";
-
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  const fixtureList = document.getElementById("fixture-list");
-
-  function teamRisk(gsp) {
-    if (gsp < 50) return { text: "High Risk", cls: "high" };
-    if (gsp >= 55 && gsp <= 60) return { text: "Medium Risk", cls: "medium" };
-    if (gsp >= 61) return { text: "Low Risk", cls: "low" };
-    return { text: "Unclear", cls: "" };
-  }
-
-  function combinedRisk(sum) {
-    if (sum >= 140) return { text: "Low Risk", cls: "low" };
-    if (sum >= 100) return { text: "Medium Risk", cls: "medium" };
-    return { text: "High Risk", cls: "high" };
-  }
-
-  async function loadSamples() {
-    try {
-      const { data, error } = await supabase
-        .from("fixtures")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(3);
-
-      if (error) throw error;
-
-      if (!data || data.length === 0) {
-        fixtureList.innerHTML = "<p style='grid-column:1/-1;text-align:center;'>No samples available yet.</p>";
-        return;
-      }
-
-      fixtureList.innerHTML = data.map((f, index) => {
-        const home = Number(f.home_gsp) || 0;
-        const away = Number(f.away_gsp) || 0;
-        const total = home + away;
-
-        const hRisk = teamRisk(home);
-        const aRisk = teamRisk(away);
-        const cRisk = combinedRisk(total);
-
-        return `
-          <div class="fixture-card" style="animation-delay: ${0.3 + index * 0.2}s;">
-            <div class="fixture-names">
-              ${f.home_name} <span style="color:#888">vs</span> ${f.away_name}
-            </div>
-
-            <div class="risk-row">
-              <span>${f.home_name} (Over 0.5)</span>
-              <span class="risk ${hRisk.cls}">${hRisk.text}</span>
-            </div>
-
-            <div class="risk-row">
-              <span>${f.away_name} (Over 0.5)</span>
-              <span class="risk ${aRisk.cls}">${aRisk.text}</span>
-            </div>
-
-            <div class="risk-row">
-              <span>Over 1.5 Goals (Combined)</span>
-              <span class="risk ${cRisk.cls}">${cRisk.text}</span>
-            </div>
-          </div>
-        `;
-      }).join("");
-    } catch (err) {
-      fixtureList.innerHTML = "<p style='grid-column:1/-1;text-align:center;color:#ff4d4d;'>Error loading samples.</p>";
+    if (error) {
+      list.innerHTML = `<div class="empty-state" style="color:var(--high)">Error: ${error.message}</div>`;
+      return;
     }
+
+    if (!data || data.length === 0) {
+      list.innerHTML = '<div class="empty-state">No fixtures in database yet.</div>';
+      return;
+    }
+
+    list.innerHTML = data.map((f, i) => renderCard(f, i)).join('');
   }
 
-  loadSamples();
+  window.addEventListener('DOMContentLoaded', loadSamples);
 </script>
 
 </body>
