@@ -289,17 +289,24 @@
   }
 
   async function loadFixtures() {
+    // Calculate the cutoff: start of day, 4 days ago
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 4);
+    cutoff.setHours(0, 0, 0, 0);
+
     const { data, error } = await supabaseClient
       .from('fixtures')
       .select('*')
+      .gte('created_at', cutoff.toISOString())   // from 4 days ago
+      .lte('created_at', new Date().toISOString()) // up to now
       .order('created_at', { ascending: false });
 
     const bestList    = document.getElementById('best-list');
     const fixtureList = document.getElementById('fixture-list');
 
     if (error || !data || data.length === 0) {
-      bestList.innerHTML    = '<div class="empty-state">No best picks available.</div>';
-      fixtureList.innerHTML = '<div class="empty-state">No fixtures found.</div>';
+      bestList.innerHTML    = '<div class="empty-state">No best picks in the last 4 days.</div>';
+      fixtureList.innerHTML = '<div class="empty-state">No fixtures found in the last 4 days.</div>';
       return;
     }
 
@@ -307,7 +314,7 @@
 
     bestList.innerHTML = best.length
       ? best.map((f, i) => renderCard(f, true, i)).join('')
-      : '<div class="empty-state">No fixtures with GSP &gt; 60% on both sides right now.</div>';
+      : '<div class="empty-state">No fixtures with GSP &gt; 60% on both sides in the last 4 days.</div>';
 
     fixtureList.innerHTML = data.map((f, i) => renderCard(f, false, i)).join('');
   }
