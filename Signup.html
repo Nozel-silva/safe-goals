@@ -17,13 +17,8 @@
       </svg>
     </div>
 
-    <h1 id="page-title">Welcome back</h1>
-    <p class="subtitle" id="page-sub">Sign in to your account to continue</p>
-
-    <div class="tab-row">
-      <button class="tab active" id="tab-login" onclick="switchTab('login')">Sign in</button>
-      <button class="tab" id="tab-signup" onclick="switchTab('signup')">Sign up</button>
-    </div>
+    <h1>Get started</h1>
+    <p class="subtitle">Sign in or create an account in one tap</p>
 
     <div id="error-msg" class="error-box"></div>
 
@@ -36,33 +31,6 @@
       </svg>
       Continue with Google
     </button>
-
-    <div class="divider"><span>or</span></div>
-
-    <div class="panel active" id="panel-login">
-      <div class="field">
-        <label>Email address</label>
-        <input type="email" id="login-email" placeholder="you@example.com" />
-      </div>
-      <div class="field">
-        <label>Password</label>
-        <input type="password" id="login-password" placeholder="••••••••" />
-      </div>
-      <p class="forgot" onclick="handleForgot()">Forgot your password?</p>
-      <button class="submit-btn" onclick="handleLogin()">Sign in</button>
-    </div>
-
-    <div class="panel" id="panel-signup">
-      <div class="field">
-        <label>Email address</label>
-        <input type="email" id="signup-email" placeholder="you@example.com" />
-      </div>
-      <div class="field">
-        <label>Password</label>
-        <input type="password" id="signup-password" placeholder="Min. 8 characters" />
-      </div>
-      <button class="submit-btn" onclick="handleSignup()">Create account</button>
-    </div>
 
     <p class="footer-text">By continuing, you agree to your project's terms of service.</p>
   </div>
