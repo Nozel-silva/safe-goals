@@ -61,3 +61,23 @@ async function handleForgot() {
   if (error) showError(error.message)
   else showError('Password reset email sent! Check your inbox.')
 }
+
+function showError(msg) {
+  const el = document.getElementById('error-msg')
+  el.textContent = msg
+  el.style.display = 'block'
+}
+
+async function handleGoogle() {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: window.location.origin + '/dashboard'
+    }
+  })
+  if (error) showError(error.message)
+}
+
+function handleThankYou() {
+  alert('Thank you!')
+}
