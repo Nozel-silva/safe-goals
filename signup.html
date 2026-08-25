@@ -52,16 +52,14 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
   msg.style.color = 'var(--muted)';
   msg.textContent = 'Creating account...';
 
-  const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({ email, password });
+  const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
+    email,
+    password,
+    options: { data: { username } }
+  });
+
   if (signUpError) { msg.style.color = 'var(--err)'; msg.textContent = signUpError.message; return; }
-
-  const userId = signUpData.user?.id;
-  if (!userId) { msg.textContent = 'Check your email to confirm your account, then log in.'; return; }
-
-  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
-  const { error: profileError } = await supabaseClient.from('profiles')
-    .insert({ id: userId, username, email, expires_at: expiresAt });
-  if (profileError) { msg.style.color = 'var(--err)'; msg.textContent = profileError.message; return; }
+  if (!signUpData.user) { msg.textContent = 'Check your email to confirm your account, then log in.'; return; }
 
   msg.style.color = 'var(--accent)';
   msg.textContent = 'Account created! Redirecting...';
