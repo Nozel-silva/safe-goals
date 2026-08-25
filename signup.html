@@ -35,8 +35,8 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
 
 // Gate: only accessible via redirect from pay.html
 (function gateAccess(){
-  if (!document.referrer.includes('pay.html')) {
-    window.location.href = 'pay.html';
+  if (!document.referrer.includes('https://paystack.shop/pay/fqlm48nc1i')) {
+    window.location.href = 'https://paystack.shop/pay/fqlm48nc1i';
   }
 })();
 
