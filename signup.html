@@ -62,8 +62,8 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
   if (profileError) { msg.style.color = 'var(--err)'; msg.textContent = profileError.message; return; }
 
   msg.style.color = 'var(--accent)';
-  msg.textContent = 'Account created! Redirecting to login...';
-  setTimeout(() => window.location.href = 'login.html', 1200);
+  msg.textContent = 'Account created! Redirecting...';
+  setTimeout(() => window.location.href = 'dashboard.html', 1200);
 });
 </script>
 </body>
