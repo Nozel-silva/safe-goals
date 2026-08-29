@@ -15,10 +15,16 @@
   button{width:100%;padding:0.7rem;background:var(--accent);color:#000;font-weight:700;border:none;border-radius:8px;cursor:pointer;}
 
   .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;z-index:200;}
-  .modal{background:var(--card);border:1px solid var(--accent);border-radius:14px;padding:1.8rem;max-width:320px;text-align:center;}
+  .modal{position:relative;background:var(--card);border:1px solid var(--accent);border-radius:14px;padding:1.8rem;max-width:320px;text-align:center;}
   .modal.error{border-color:var(--err);}
   .modal h2{font-size:1rem;margin-bottom:0.6rem;}
   .modal p{color:var(--muted);font-size:0.85rem;}
+  .modal-close{
+    position:absolute;top:10px;right:12px;
+    background:none;border:none;width:auto;padding:0;
+    color:var(--muted);font-size:1.1rem;cursor:pointer;line-height:1;
+  }
+  .modal-close:hover{color:var(--text);}
 </style>
 </head>
 <body>
@@ -34,6 +40,7 @@
 
 <div class="overlay" id="alertModal">
   <div class="modal" id="alertBox">
+    <button class="modal-close" id="alertClose">&times;</button>
     <h2 id="alertTitle"></h2>
     <p id="alertText"></p>
   </div>
@@ -42,7 +49,7 @@
 <script>
 const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY";
-  
+
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // Gate: only accessible via redirect from paid.html
@@ -59,6 +66,10 @@ function showAlert(success, text) {
   document.getElementById('alertModal').style.display = 'flex';
 }
 
+document.getElementById('alertClose').addEventListener('click', () => {
+  document.getElementById('alertModal').style.display = 'none';
+});
+
 document.getElementById('resetForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const username = document.getElementById('username').value.trim();
@@ -66,18 +77,20 @@ document.getElementById('resetForm').addEventListener('submit', async (e) => {
   const currentPassword = document.getElementById('currentPassword').value;
 
   const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: currentPassword });
-  if (error) { showAlert(false, 'Username, email, or password is incorrect.'); return; }
+  if (error) { showAlert(false, error.message); return; }
 
   const { data: profile, error: profileErr } = await supabaseClient
     .from('profiles').select('username').eq('id', data.user.id).single();
-  if (profileErr || profile.username !== username) { showAlert(false, 'Username does not match this account.'); return; }
+  if (profileErr) { showAlert(false, profileErr.message); return; }
+  if (profile.username !== username) { showAlert(false, 'Username does not match this account.'); return; }
 
   const newExpiry = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
   const { error: updateErr } = await supabaseClient.from('profiles')
     .update({ expires_at: newExpiry }).eq('id', data.user.id);
   if (updateErr) { showAlert(false, updateErr.message); return; }
 
-  showAlert(true, 'Access extended by 30 days! You can now log in.');
+  showAlert(true, 'Access extended by 30 days!');
+  setTimeout(() => window.location.href = 'dashboard.html', 1500);
 });
 </script>
 </body>
