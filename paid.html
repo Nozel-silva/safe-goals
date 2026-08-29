@@ -1,45 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Processing — L.E.V.I</title>
-  <style>
-    body {
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #d4f1ff, #e3f8ff);
-      color: #004466;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      text-align: center;
-    }
-    .message {
-      background: white;
-      padding: 40px 60px;
-      border-radius: 16px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    }
-  </style>
-</head>
+<head><meta charset="UTF-8"><title>Redirecting to renewal payment...</title></head>
 <body>
-  <div class="message">
-    <h2>Verifying payment...</h2>
-    <p>Please wait a moment.</p>
-  </div>
-
-  <script>
-    const PAYSTACK_URL = 'https://paystack.shop/pay/o1lru4fygx';
-
-    const params = new URLSearchParams(window.location.search);
-    const ref = params.get('reference') || params.get('trxref');
-
-    if (!ref) {
-      window.location.href = PAYSTACK_URL;
-    } else {
-      window.location.href = 'reset.html';
-    }
-  </script>
+<script>
+  window.location.href = 'reset.html';
+</script>
 </body>
 </html>
