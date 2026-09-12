@@ -65,7 +65,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
   if (new Date(profile.expires_at) < new Date()) {
     await supabaseClient.auth.signOut();
     document.getElementById('expiredModal').style.display = 'flex';
-    setTimeout(() => window.location.href = 'paid.html', 1800);
+    setTimeout(() => window.location.href = 'https://paystack.shop/pay/rsct', 1800);
     return;
   }
 
