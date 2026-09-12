@@ -1,3 +1,20 @@
+// ===== Access control (runs before anything else) =====
+(function checkAccess() {
+  let key = prompt('Enter access key:');
+
+  while (key !== 'limit') {
+    if (key === null) {
+      // User hit Cancel — block the page entirely
+      document.body.innerHTML =
+        '<h1 style="color:#e2e8f0;text-align:center;margin-top:40vh;font-family:Inter,sans-serif;">Access Denied</h1>';
+      throw new Error('Access denied');
+    }
+    key = prompt('Incorrect key. Try again:');
+  }
+
+  alert('✅ Access granted');
+})();
+
 // ===== GSP calculator logic (separate from submission logic below) =====
 const teamData = { '1': null, '2': null };
 
