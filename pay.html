@@ -1,9 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><title>Redirecting to payment...</title></head>
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting to payment...</title>
+</head>
 <body>
 <script>
-  window.location.href = 'signup.html';
+  const allowedReferrer = 'https://paystack.shop/pay/gcss';
+
+  if (document.referrer.startsWith(allowedReferrer)) {
+    window.location.href = 'signup.html';
+  } else {
+    document.body.innerHTML =
+      '<h1 style="text-align:center;margin-top:20vh;font-family:sans-serif;">Access Denied</h1>' +
+      '<p style="text-align:center;font-family:sans-serif;">This page is only accessible after completing payment.</p>';
+  }
 </script>
 </body>
 </html>
