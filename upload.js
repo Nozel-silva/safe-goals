@@ -1,20 +1,3 @@
-// ===== Access control (runs before anything else) =====
-(function checkAccess() {
-  let key = prompt('Enter access key:');
-
-  while (key !== 'limit') {
-    if (key === null) {
-      // User hit Cancel — block the page entirely
-      document.body.innerHTML =
-        '<h1 style="color:#e2e8f0;text-align:center;margin-top:40vh;font-family:Inter,sans-serif;">Access Denied</h1>';
-      throw new Error('Access denied');
-    }
-    key = prompt('Incorrect key. Try again:');
-  }
-
-  alert('✅ Access granted');
-})();
-
 // ===== GSP calculator logic (separate from submission logic below) =====
 const teamData = { '1': null, '2': null };
 
@@ -32,21 +15,22 @@ function calculateTeam(n) {
 
   const formValue = parseFloat(document.getElementById('form' + n + 'Input').value) || 0;
   const trueGsp = (gsp + formValue) / 2;
+  const roundedTrueGsp = Math.round(trueGsp);
 
   document.getElementById('gsp' + n).textContent = gsp.toFixed(2) + '%';
-  document.getElementById('ar' + n).textContent = trueGsp.toFixed(2);
+  document.getElementById('ar' + n).textContent = roundedTrueGsp;
 
   const clubName = document.getElementById('clubName' + n).value || (n === '1' ? 'Home' : 'Away');
 
-  teamData[n] = { club: clubName, ar: trueGsp };
+  teamData[n] = { club: clubName, ar: roundedTrueGsp };
 
   // Push values into the submission form fields below
   if (n === '1') {
     document.getElementById('homeName').value = clubName;
-    document.getElementById('homeGSP').value = trueGsp.toFixed(2);
+    document.getElementById('homeGSP').value = roundedTrueGsp;
   } else {
     document.getElementById('awayName').value = clubName;
-    document.getElementById('awayGSP').value = trueGsp.toFixed(2);
+    document.getElementById('awayGSP').value = roundedTrueGsp;
   }
 
   updateMatchSummary();
@@ -62,12 +46,12 @@ function updateMatchSummary() {
     return;
   }
 
-  const diff = Math.abs(home.ar - away.ar).toFixed(2);
+  const diff = Math.abs(home.ar - away.ar);
   const favoured = home.ar === away.ar
     ? 'Evenly matched'
     : (home.ar > away.ar ? home.club : away.club) + ' favoured';
 
-  el.innerHTML = `${home.club}: ${home.ar.toFixed(2)} &nbsp;|&nbsp; ${away.club}: ${away.ar.toFixed(2)}<br>${favoured} (margin: ${diff})`;
+  el.innerHTML = `${home.club}: ${home.ar} &nbsp;|&nbsp; ${away.club}: ${away.ar}<br>${favoured} (margin: ${diff})`;
 }
 
 // ===== Submission logic (untouched from your original) =====
