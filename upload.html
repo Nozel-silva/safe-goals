@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SafeGoals - Submit Fixture</title>
+  <title>SafeGoals - GSP & Submit Fixture</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -13,94 +13,349 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Orbitron', sans-serif;
+      font-family: 'Inter', sans-serif;
     }
 
     body {
-      background-color: #000;
-      color: #aaffaa;
+      background-color: #0f172a;
+      color: #e2e8f0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
       min-height: 100vh;
-      padding: 20px;
+      padding: 32px 20px;
     }
 
-    h1 {
-  font-size: 1.8rem;
-  margin-bottom: 20px;
-  text-align: center;
-  width: 100%;
-  text-shadow: 0 0 5px #aaffaa, 0 0 10px #44ff44;
-  animation: glow 2s ease-in-out infinite alternate;
-    }
-    
-    @keyframes glow {
-      from {
-        text-shadow: 0 0 5px #aaffaa, 0 0 10px #44ff44;
-      }
-      to {
-        text-shadow: 0 0 15px #55ff55, 0 0 25px #88ff88;
-      }
-    }
-
-    form {
-      background-color: #111;
-      padding: 25px 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px #1a1a1a;
+    .page-wrap {
       width: 100%;
-      max-width: 400px;
+      max-width: 420px;
+    }
+
+    header {
+      margin-bottom: 28px;
+      text-align: left;
+    }
+
+    header .brand {
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+
+    h2 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .gsp-section {
+      margin-bottom: 32px;
+    }
+
+    .gsp-container {
       display: flex;
       flex-direction: column;
-      gap: 15px;
-      animation: slideUp 0.7s ease-out;
+      gap: 16px;
+      margin-bottom: 16px;
     }
 
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(50px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .team-card {
+      background-color: #1e293b;
+      border: 1px solid #334155;
+      padding: 18px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
-    input {
-      padding: 12px;
-      border: 1px solid #aaffaa;
-      background-color: #000;
-      color: #aaffaa;
+    .team-card h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      margin-bottom: 2px;
+    }
+
+    .team-card label {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .team-card input {
+      padding: 9px 10px;
+      border: 1px solid #334155;
+      background-color: #0f172a;
+      color: #e2e8f0;
       border-radius: 6px;
+      font-size: 0.85rem;
+      width: 100%;
     }
 
-    button {
-      background-color: #aaffaa;
-      color: #000;
+    .team-card input:focus {
+      outline: none;
+      border-color: #3b82f6;
+    }
+
+    .team-card button {
+      background-color: #3b82f6;
+      color: #fff;
       border: none;
-      padding: 12px;
+      padding: 9px;
       border-radius: 6px;
-      font-weight: bold;
+      font-weight: 600;
+      font-size: 0.82rem;
       cursor: pointer;
+      margin-top: 4px;
+    }
+
+    .team-card button:hover {
+      background-color: #2563eb;
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      padding: 6px 0;
+      border-top: 1px solid #334155;
+    }
+
+    .stats-row span:first-child {
+      color: #94a3b8;
+    }
+
+    .stats-row span:last-child {
+      color: #f1f5f9;
+      font-weight: 600;
+    }
+
+    #matchSummary {
+      background-color: #1e293b;
+      border: 1px solid #334155;
+      padding: 16px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+    }
+
+    /* ---- Submission form ---- */
+    form#fixture-form {
+      background-color: #1e293b;
+      border: 1px solid #334155;
+      padding: 20px 18px;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    form#fixture-form input {
+      padding: 10px;
+      border: 1px solid #334155;
+      background-color: #0f172a;
+      color: #e2e8f0;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    form#fixture-form input:focus {
+      outline: none;
+      border-color: #10b981;
+    }
+
+    form#fixture-form button {
+      background-color: #10b981;
+      color: #0f172a;
+      border: none;
+      padding: 11px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    form#fixture-form button:hover {
+      background-color: #0ea975;
+    }
+
+    /* ---- Desktop view ---- */
+    @media (min-width: 900px) {
+      body {
+        padding: 48px;
+      }
+
+      .page-wrap {
+        max-width: 960px;
+        display: grid;
+        grid-template-columns: 1fr 340px;
+        gap: 32px;
+        align-items: start;
+      }
+
+      header {
+        grid-column: 1 / -1;
+      }
+
+      .gsp-section {
+        grid-column: 1;
+        margin-bottom: 0;
+      }
+
+      .gsp-container {
+        flex-direction: row;
+      }
+
+      .team-card {
+        flex: 1;
+      }
+
+      form#fixture-form {
+        grid-column: 2;
+        position: sticky;
+        top: 48px;
+      }
     }
   </style>
 </head>
 
 <body>
-  <h1>🚀 SafeGoals Upload</h1>
+  <div class="page-wrap">
+    <header>
+      <div class="brand">SafeGoals</div>
+      <h1>Fixture Risk Analysis</h1>
+    </header>
 
-  <form id="fixture-form">
-    <input type="text" id="homeName" placeholder="Home Team" required />
-    <input type="text" id="awayName" placeholder="Away Team" required />
-    <input type="number" id="homeGSP" placeholder="Home GSP" required />
-    <input type="number" id="awayGSP" placeholder="Away GSP" required />
-    <button type="submit">Save Fixture</button>
-  </form>
+    <!-- ===== GSP Calculator ===== -->
+    <div class="gsp-section">
+      <h2>GSP Calculator</h2>
+      <div class="gsp-container">
+        <div class="team-card">
+          <h3>Home Team</h3>
+          <label>Club Name</label>
+          <input type="text" id="clubName1">
+
+          <label for="homeGoals1">Goals scored at Home (prev 5)</label>
+          <input type="number" id="homeGoals1" placeholder="e.g. 9">
+
+          <label for="awayGoals1">Goals scored Away (prev 5)</label>
+          <input type="number" id="awayGoals1" placeholder="e.g. 6">
+
+          <label for="form1Input">Form rating (0–100)</label>
+          <input type="number" id="form1Input" min="0" max="100" placeholder="e.g. 70">
+
+          <button type="button" onclick="calculateTeam('1')">Calculate</button>
+
+          <div class="stats-row"><span>GSP</span><span id="gsp1">—</span></div>
+          <div class="stats-row"><span>True GSP</span><span id="ar1">—</span></div>
+        </div>
+
+        <div class="team-card">
+          <h3>Away Team</h3>
+          <label>Club Name</label>
+          <input type="text" id="clubName2">
+
+          <label for="awayGoals2">Goals scored Away (prev 5)</label>
+          <input type="number" id="awayGoals2" placeholder="e.g. 7">
+
+          <label for="homeGoals2">Goals scored at Home (prev 5)</label>
+          <input type="number" id="homeGoals2" placeholder="e.g. 5">
+
+          <label for="form2Input">Form rating (0–100)</label>
+          <input type="number" id="form2Input" min="0" max="100" placeholder="e.g. 55">
+
+          <button type="button" onclick="calculateTeam('2')">Calculate</button>
+
+          <div class="stats-row"><span>GSP</span><span id="gsp2">—</span></div>
+          <div class="stats-row"><span>True GSP</span><span id="ar2">—</span></div>
+        </div>
+      </div>
+
+      <div id="matchSummary">
+        Calculate both teams to see the comparison.
+      </div>
+    </div>
+
+    <!-- ===== Submission Form (untouched logic) ===== -->
+    <form id="fixture-form">
+      <input type="text" id="homeName" placeholder="Home Team" required />
+      <input type="text" id="awayName" placeholder="Away Team" required />
+      <input type="number" id="homeGSP" placeholder="Home GSP" required />
+      <input type="number" id="awayGSP" placeholder="Away GSP" required />
+      <button type="submit">Save Fixture</button>
+    </form>
+  </div>
 
   <script>
+    // ===== GSP calculator logic (separate from submission logic below) =====
+    const teamData = { '1': null, '2': null };
+
+    function calculateTeam(n) {
+      const primaryGoals = n === '1'
+        ? parseFloat(document.getElementById('homeGoals1').value) || 0
+        : parseFloat(document.getElementById('awayGoals2').value) || 0;
+
+      const secondaryGoals = n === '1'
+        ? parseFloat(document.getElementById('awayGoals1').value) || 0
+        : parseFloat(document.getElementById('homeGoals2').value) || 0;
+
+      const sum = primaryGoals + secondaryGoals;
+      const gsp = sum === 0 ? 0 : (primaryGoals / sum) * 100;
+
+      const formValue = parseFloat(document.getElementById('form' + n + 'Input').value) || 0;
+      const trueGsp = (gsp + formValue) / 2;
+
+      document.getElementById('gsp' + n).textContent = gsp.toFixed(2) + '%';
+      document.getElementById('ar' + n).textContent = trueGsp.toFixed(2);
+
+      const clubName = document.getElementById('clubName' + n).value || (n === '1' ? 'Home' : 'Away');
+
+      teamData[n] = { club: clubName, ar: trueGsp };
+
+      // Push values into the submission form fields below
+      if (n === '1') {
+        document.getElementById('homeName').value = clubName;
+        document.getElementById('homeGSP').value = trueGsp.toFixed(2);
+      } else {
+        document.getElementById('awayName').value = clubName;
+        document.getElementById('awayGSP').value = trueGsp.toFixed(2);
+      }
+
+      updateMatchSummary();
+    }
+
+    function updateMatchSummary() {
+      const home = teamData['1'];
+      const away = teamData['2'];
+      const el = document.getElementById('matchSummary');
+
+      if (!home || !away) {
+        el.textContent = 'Calculate both teams to see the comparison.';
+        return;
+      }
+
+      const diff = Math.abs(home.ar - away.ar).toFixed(2);
+      const favoured = home.ar === away.ar
+        ? 'Evenly matched'
+        : (home.ar > away.ar ? home.club : away.club) + ' favoured';
+
+      el.innerHTML = `${home.club}: ${home.ar.toFixed(2)} &nbsp;|&nbsp; ${away.club}: ${away.ar.toFixed(2)}<br>${favoured} (margin: ${diff})`;
+    }
+
+    // ===== Submission logic (untouched from your original) =====
     document.addEventListener('DOMContentLoaded', () => {
       console.log('JS loaded ✅');
 
@@ -149,4 +404,4 @@
     });
   </script>
 </body>
-</html>
+            </html>
