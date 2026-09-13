@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SafeGoals – Risk Analysis</title>
 
+  <link rel="icon" type="image/png" href="favicon.png">
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
@@ -20,6 +22,7 @@
       --high: #ff3b3b;
       --gold: #ffd700;
       --gold-dim: #a08700;
+      --err: #ff3b3b;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -30,6 +33,24 @@
       font-family: 'Syne', sans-serif;
       min-height: 100vh;
     }
+
+    #auth-gate {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-dark);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);align-items:center;justify-content:center;z-index:998;}
+    .modal{background:var(--card-bg);border:1px solid var(--err);border-radius:14px;padding:1.8rem;max-width:340px;text-align:center;}
+    .modal h2{color:var(--err);font-size:1rem;margin-bottom:0.6rem;}
+    .modal p{color:var(--text-muted);font-size:0.85rem;}
 
     header {
       background: #0d0d0d;
@@ -200,6 +221,15 @@
 
 <body>
 
+<div id="auth-gate">Checking access...</div>
+
+<div class="overlay" id="expiredModal">
+  <div class="modal">
+    <h2>Access Expired</h2>
+    <p>Your subscription has expired. Redirecting you to renew access...</p>
+  </div>
+</div>
+
 <header>
   <div class="logo">Safe<span>Goals</span></div>
   <div class="header-badge">Goal Risk Analysis</div>
@@ -237,6 +267,38 @@
   const SUPABASE_URL = 'https://ccmsjcnuyrngqxwrswfe.supabase.co';
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY';
   const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ===== Auth + expiry gate — runs before anything else renders =====
+  async function checkAuth() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+
+    if (!session) {
+      window.location.href = 'login.html';
+      return false;
+    }
+
+    const { data: profile, error: profileErr } = await supabaseClient
+      .from('profiles')
+      .select('expires_at')
+      .eq('id', session.user.id)
+      .single();
+
+    if (profileErr) {
+      // Can't verify expiry — safest is to bounce to login rather than show content
+      window.location.href = 'login.html';
+      return false;
+    }
+
+    if (new Date(profile.expires_at) < new Date()) {
+      await supabaseClient.auth.signOut();
+      document.getElementById('expiredModal').style.display = 'flex';
+      setTimeout(() => window.location.href = 'https://paystack.shop/pay/rsct', 1800);
+      return false;
+    }
+
+    document.getElementById('auth-gate').style.display = 'none';
+    return true;
+  }
 
   function getTeamRisk(gsp) {
     if (gsp < 50)               return { text: "High Risk",   cls: "high"   };
@@ -289,7 +351,6 @@
   }
 
   async function loadFixtures() {
-    // Calculate the cutoff: start of day, 4 days ago
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - 4);
     cutoff.setHours(0, 0, 0, 0);
@@ -297,8 +358,8 @@
     const { data, error } = await supabaseClient
       .from('fixtures')
       .select('*')
-      .gte('created_at', cutoff.toISOString())   // from 4 days ago
-      .lte('created_at', new Date().toISOString()) // up to now
+      .gte('created_at', cutoff.toISOString())
+      .lte('created_at', new Date().toISOString())
       .order('created_at', { ascending: false });
 
     const bestList    = document.getElementById('best-list');
@@ -319,7 +380,12 @@
     fixtureList.innerHTML = data.map((f, i) => renderCard(f, false, i)).join('');
   }
 
-  loadFixtures();
+  (async () => {
+    const authed = await checkAuth();
+    if (authed) {
+      loadFixtures();
+    }
+  })();
 </script>
 
 </body>
