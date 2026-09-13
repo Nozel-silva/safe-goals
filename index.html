@@ -6,394 +6,98 @@
   <title>SafeGoals – Smarter Goal Risk Analysis</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.7/dist/umd/supabase.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
-  <style>
-    :root {
-      --bg: #0a0a0a;
-      --card: #111111;
-      --border: #1e1e1e;
-      --text: #f0f0f0;
-      --muted: #555;
-      --muted2: #888;
-      --low: #00e87a;
-      --medium: #f5a623;
-      --high: #ff3b3b;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Syne', sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    /* ── NAV ── */
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(10,10,10,0.95);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: 1rem 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .logo { font-size: 1.25rem; font-weight: 800; color: var(--low); letter-spacing: -0.5px; }
-    .logo span { color: var(--muted2); font-weight: 400; }
-    .nav-actions { display: flex; gap: 0.75rem; align-items: center; }
-    .nav-btn {
-      font-family: 'Syne', sans-serif;
-      font-size: 0.8rem;
-      font-weight: 700;
-      padding: 0.5rem 1.2rem;
-      border-radius: 8px;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .nav-btn.solid { background: var(--low); color: #000; }
-    .nav-btn.solid:hover { background: #00cc6a; transform: translateY(-1px); }
-    .nav-btn.whatsapp { background: #25D366; color: #fff; }
-    .nav-btn.whatsapp:hover { background: #1eb356; transform: translateY(-1px); }
-
-    /* ── HERO ── */
-    .hero {
-      padding: 7rem 2rem 6rem;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .hero::before {
-      content: '';
-      position: absolute;
-      top: -100px; left: 50%;
-      transform: translateX(-50%);
-      width: 700px; height: 700px;
-      background: radial-gradient(circle, rgba(0,232,122,0.06) 0%, transparent 70%);
-      pointer-events: none;
-    }
-    .hero-eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: rgba(0,232,122,0.06);
-      border: 1px solid rgba(0,232,122,0.15);
-      color: var(--low);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.72rem;
-      padding: 0.35rem 0.9rem;
-      border-radius: 20px;
-      letter-spacing: 0.08em;
-      margin-bottom: 1.8rem;
-    }
-    .hero-eyebrow .dot {
-      width: 6px; height: 6px;
-      background: var(--low);
-      border-radius: 50%;
-      animation: blink 1.5s infinite;
-    }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
-
-    .hero h1 {
-      font-size: clamp(3rem, 9vw, 5.5rem);
-      font-weight: 800;
-      letter-spacing: -3px;
-      line-height: 1;
-      margin-bottom: 1.5rem;
-      color: var(--text);
-    }
-    .hero h1 .green { color: var(--low); }
-    .hero p {
-      font-size: clamp(1rem, 2.5vw, 1.2rem);
-      color: var(--muted2);
-      max-width: 580px;
-      margin: 0 auto 2.5rem;
-      line-height: 1.7;
-    }
-    .hero p strong { color: var(--text); font-weight: 600; }
-    .hero-cta { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.85rem; }
-    .cta-btn {
-      font-family: 'Syne', sans-serif;
-      font-size: 0.95rem;
-      font-weight: 700;
-      padding: 0.85rem 2rem;
-      border-radius: 10px;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .cta-primary { background: var(--low); color: #000; }
-    .cta-primary:hover { background: #00cc6a; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,232,122,0.2); }
-    .cta-wa { background: #25D366; color: #fff; }
-    .cta-wa:hover { background: #1eb356; transform: translateY(-2px); }
-    .cta-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted2); }
-    .cta-ghost:hover { border-color: #333; color: var(--text); }
-
-    /* ── STATS BAR ── */
-    .stats-bar {
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      background: #0d0d0d;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .stat-item {
-      padding: 1.5rem 3rem;
-      text-align: center;
-      border-right: 1px solid var(--border);
-    }
-    .stat-item:last-child { border-right: none; }
-    .stat-num { font-size: 1.8rem; font-weight: 800; color: var(--low); font-family: 'JetBrains Mono', monospace; display: block; }
-    .stat-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-family: 'JetBrains Mono', monospace; margin-top: 0.2rem; display: block; }
-
-    /* ── SECTIONS ── */
-    .section { padding: 5rem 2rem; max-width: 1100px; margin: 0 auto; }
-    .section-label { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--low); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.8rem; }
-    .section-title { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 800; letter-spacing: -1px; margin-bottom: 0.75rem; color: var(--text); }
-    .section-sub { color: var(--muted2); font-size: 1rem; line-height: 1.7; max-width: 560px; }
-
-    /* ── HOW IT WORKS ── */
-    .how-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-      margin-top: 3rem;
-    }
-    .how-item { background: var(--card); padding: 2rem 1.8rem; transition: background 0.2s; }
-    .how-item:hover { background: #151515; }
-    .how-num { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); letter-spacing: 0.1em; margin-bottom: 1rem; }
-    .how-icon {
-      width: 40px; height: 40px;
-      background: rgba(0,232,122,0.08);
-      border: 1px solid rgba(0,232,122,0.15);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--low); font-size: 1rem; margin-bottom: 1rem;
-    }
-    .how-item h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
-    .how-item p { font-size: 0.85rem; color: var(--muted2); line-height: 1.6; }
-
-    /* ── LEGEND ── */
-    .legend-row { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 3rem; }
-    .legend-chip {
-      display: flex; align-items: center; gap: 0.5rem;
-      background: var(--card); border: 1px solid var(--border);
-      border-radius: 8px; padding: 0.7rem 1.2rem;
-      font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
-    }
-    .chip-dot { width: 8px; height: 8px; border-radius: 50%; }
-
-    /* ── FIXTURE CARDS ── */
-    .fixtures-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1rem;
-      margin-top: 2rem;
-    }
-    .fixture-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 1.2rem;
-      transition: border-color 0.2s, transform 0.2s;
-      animation: fadeUp 0.4s ease both;
-    }
-    .fixture-card:hover { border-color: #2a2a2a; transform: translateY(-2px); }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(12px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .fixture-teams {
-      font-size: 0.98rem; font-weight: 700; text-align: center;
-      margin-bottom: 1rem; padding-bottom: 0.8rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .fixture-teams .vs { color: var(--muted); font-weight: 400; margin: 0 0.4rem; font-size: 0.85rem; }
-    .sub-label {
-      font-size: 0.65rem; font-family: 'JetBrains Mono', monospace;
-      color: var(--muted); text-transform: uppercase;
-      letter-spacing: 0.08em; margin: 0.6rem 0 0.3rem;
-    }
-    .risk-row { display: flex; justify-content: space-between; align-items: center; margin: 0.3rem 0; }
-    .team-name { font-family: 'JetBrains Mono', monospace; font-size: 0.76rem; color: #bbb; }
-    .risk-pill {
-      font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
-      font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 4px;
-    }
-    .risk-pill.low    { color: var(--low);    background: rgba(0,232,122,0.08); }
-    .risk-pill.medium { color: var(--medium); background: rgba(245,166,35,0.08); }
-    .risk-pill.high   { color: var(--high);   background: rgba(255,59,59,0.08); }
-    .card-divider { border: none; border-top: 1px solid var(--border); margin: 0.7rem 0 0.4rem; }
-    .combined-row { display: flex; justify-content: space-between; align-items: center; }
-    .combined-label { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--muted2); }
-    .empty-state {
-      grid-column: 1/-1; text-align: center; padding: 3rem;
-      color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
-    }
-
-    /* ── CTA BANNER ── */
-    .cta-banner {
-      margin: 2rem 0 0;
-      background: #0d0d0d;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 3rem 2rem;
-      text-align: center;
-    }
-    .cta-banner h3 { font-size: 1.4rem; font-weight: 800; margin-bottom: 0.6rem; }
-    .cta-banner p { color: var(--muted2); font-size: 0.9rem; margin-bottom: 1.5rem; }
-    .cta-banner-btns { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.75rem; }
-
-    /* ── FOOTER ── */
-    footer {
-      border-top: 1px solid var(--border);
-      background: #0d0d0d;
-      padding: 2rem;
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 1rem;
-    }
-    .footer-logo { font-size: 1rem; font-weight: 800; color: var(--low); }
-    .footer-logo span { color: var(--muted); font-weight: 400; }
-    .footer-note { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--muted); text-align: right; line-height: 1.6; }
-
-    @media (max-width: 640px) {
-      .hero { padding: 5rem 1.2rem 4rem; }
-      .stat-item { padding: 1.2rem 1.5rem; border-right: none; border-bottom: 1px solid var(--border); }
-      .section { padding: 3.5rem 1.2rem; }
-      footer { flex-direction: column; text-align: center; }
-      .footer-note { text-align: center; }
-      nav { padding: 0.9rem 1.2rem; }
-      .nav-btn span { display: none; }
-    }
-  </style>
+  <link rel="stylesheet" href="index.css">
 </head>
 <body>
 
 <!-- NAV -->
 <nav>
   <div class="logo">Safe<span>Goals</span></div>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#samples">Samples</a>
+  </div>
   <div class="nav-actions">
-    <a href="https://wa.me/2349016501345" target="_blank" class="nav-btn whatsapp">
-      <i class="fab fa-whatsapp"></i> <span>WhatsApp</span>
-    </a>
-    <a href="https://paystack.shop/pay/fqlm48nc1i" class="nav-btn solid">
-      <i class="fas fa-bolt"></i> <span>Get Access</span>
-    </a>
+    <a href="login.html" class="nav-link-btn">Login</a>
+    <a href="https://paystack.shop/pay/fqlm48nc1i" class="nav-btn-solid">Sign Up</a>
   </div>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-eyebrow">
-    <span class="dot"></span>
-    GOAL MARKET INTELLIGENCE
+  <div class="hero-left">
+    <div class="hero-tag">GOAL MARKET INTELLIGENCE</div>
+    <h1>Make the<br><span class="accent">right</span> call.</h1>
+    <p>SafeGoals runs a goal scoring probability algorithm that classifies every fixture into clear risk levels — so you skip bad setups and focus only on what makes sense.</p>
+    <div class="hero-cta">
+      <a href="https://paystack.shop/pay/fqlm48nc1i" class="btn-primary">Sign Up</a>
+      
+    </div>
   </div>
-  <h1>Make the <span class="green">right</span><br>call.</h1>
-  <p>
-    SafeGoals runs a <strong>goal scoring probability algorithm</strong> that classifies every fixture into clear risk levels — so you skip bad setups and focus only on what makes sense.
-  </p>
-  <div class="hero-cta">
-    <a href="https://paystack.shop/pay/fqlm48nc1i" class="cta-btn cta-primary">
-      <i class="fas fa-bolt"></i> Get Full Access
-    </a>
-    <a href="https://wa.me/2349016501345" target="_blank" class="cta-btn cta-wa">
-      <i class="fab fa-whatsapp"></i> Chat on WhatsApp
-    </a>
-    <a href="#samples" class="cta-btn cta-ghost">
-      <i class="fas fa-eye"></i> See Free Samples
-    </a>
+
+  <div class="hero-right">
+    <div class="console">
+      <div class="console-bar">
+        <span class="dot red"></span><span class="dot amber"></span><span class="dot green"></span>
+        <span class="console-title">safegoals engine</span>
+      </div>
+      <div class="console-body">
+        <div class="console-line"><span class="prompt">&gt;</span> engine.status</div>
+        <div class="console-line out">GSP algorithm <span class="ok">online</span></div>
+        <div class="console-line"><span class="prompt">&gt;</span> risk.levels</div>
+        <div class="console-line out">low <span class="ok">·</span> medium <span class="warn">·</span> high <span class="bad">·</span></div>
+        <div class="console-line"><span class="prompt">&gt;</span> markets.tracked</div>
+        <div class="console-line out">over 0.5 &nbsp;/&nbsp; over 1.5</div>
+        <div class="console-line"><span class="prompt">&gt;</span> fixtures.update</div>
+        <div class="console-line out">refreshed <span class="ok">daily</span><span class="cursor">_</span></div>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- STATS BAR -->
-<div class="stats-bar">
-  <div class="stat-item">
-    <span class="stat-num">GSP</span>
-    <span class="stat-label">Algorithm Engine</span>
-  </div>
-  <div class="stat-item">
-    <span class="stat-num">3</span>
-    <span class="stat-label">Risk Levels</span>
-  </div>
-  <div class="stat-item">
-    <span class="stat-num">0.5 / 1.5</span>
-    <span class="stat-label">Goal Markets</span>
-  </div>
-  <div class="stat-item">
-    <span class="stat-num">Daily</span>
-    <span class="stat-label">Updated Fixtures</span>
-  </div>
-</div>
-
 <!-- HOW IT WORKS -->
-<div class="section">
+<div class="section" id="how">
   <div class="section-label">How It Works</div>
-  <div class="section-title">Built on probability.<br>Not hype.</div>
-  <div class="section-sub">Every fixture is scored using historical goal data. No narratives, no gut feelings — just clean algorithmic output.</div>
+  <div class="section-title">Built on probability. Not hype.</div>
+  <p class="section-sub">Every fixture is scored using historical goal data. No narratives, no gut feelings  just clean algorithmic output.</p>
 
-  <div class="how-grid">
-    <div class="how-item">
-      <div class="how-num">01</div>
-      <div class="how-icon"><i class="fas fa-database"></i></div>
-      <h3>Data Input</h3>
-      <p>Historical goal scoring data is fed into the GSP engine for each team in every fixture.</p>
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-num">01</div>
+      <div class="timeline-body">
+        <h3>Data Input</h3>
+        <p>Historical goal scoring data is fed into the GSP engine for each team in every fixture.</p>
+      </div>
     </div>
-    <div class="how-item">
-      <div class="how-num">02</div>
-      <div class="how-icon"><i class="fas fa-brain"></i></div>
-      <h3>Algorithm Runs</h3>
-      <p>The goal market algorithm calculates per-team and combined scoring probabilities.</p>
+    <div class="timeline-item">
+      <div class="timeline-num">02</div>
+      <div class="timeline-body">
+        <h3>Algorithm Runs</h3>
+        <p>The goal market algorithm calculates per-team and combined scoring probabilities.</p>
+      </div>
     </div>
-    <div class="how-item">
-      <div class="how-num">03</div>
-      <div class="how-icon"><i class="fas fa-tag"></i></div>
-      <h3>Risk Tagged</h3>
-      <p>Each fixture is tagged Low, Medium, or High risk for Over 0.5 and Over 1.5 markets.</p>
+    <div class="timeline-item">
+      <div class="timeline-num">03</div>
+      <div class="timeline-body">
+        <h3>Risk Tagged</h3>
+        <p>Each fixture is tagged Low, Medium, or High risk for Over 0.5 and Over 1.5 markets.</p>
+      </div>
     </div>
-    <div class="how-item">
-      <div class="how-num">04</div>
-      <div class="how-icon"><i class="fas fa-shield-alt"></i></div>
-      <h3>You Decide</h3>
-      <p>You get clear signals to engage or skip. No pressure, no fake sure-wins.</p>
+    <div class="timeline-item">
+      <div class="timeline-num">04</div>
+      <div class="timeline-body">
+        <h3>You Decide</h3>
+        <p>You get clear signals to engage or skip. No pressure, no fake sure-wins.</p>
+      </div>
     </div>
   </div>
 
   <div class="legend-row">
-    <div class="legend-chip">
-      <span class="chip-dot" style="background: var(--low)"></span>
-      <span style="color: var(--low); font-weight:700">Low Risk</span>
-      <span style="color: var(--muted)">— GSP ≥ 61%</span>
-    </div>
-    <div class="legend-chip">
-      <span class="chip-dot" style="background: var(--medium)"></span>
-      <span style="color: var(--medium); font-weight:700">Medium Risk</span>
-      <span style="color: var(--muted)">— GSP 55–60%</span>
-    </div>
-    <div class="legend-chip">
-      <span class="chip-dot" style="background: var(--high)"></span>
-      <span style="color: var(--high); font-weight:700">High Risk</span>
-      <span style="color: var(--muted)">— GSP &lt; 50%</span>
-    </div>
+    <div class="legend-chip"><span class="chip-dot low"></span> Low Risk <span class="legend-range">GSP ≥ 61%</span></div>
+    <div class="legend-chip"><span class="chip-dot medium"></span> Medium Risk <span class="legend-range">GSP 55–60%</span></div>
+    <div class="legend-chip"><span class="chip-dot high"></span> High Risk <span class="legend-range">GSP &lt; 50%</span></div>
   </div>
 </div>
 
@@ -401,7 +105,7 @@
 <div class="section" id="samples">
   <div class="section-label">Free Preview</div>
   <div class="section-title">Sample Analyses</div>
-  <div class="section-sub">A live look at recent fixtures run through the SafeGoals algorithm. Full access unlocks all fixtures, leagues, and history.</div>
+  <p class="section-sub">A live look at recent fixtures run through the SafeGoals algorithm. Full access unlocks all fixtures, leagues, and history.</p>
 
   <div id="fixture-list" class="fixtures-grid">
     <div class="empty-state">Loading samples...</div>
@@ -411,10 +115,8 @@
     <h3>Ready for full access?</h3>
     <p>Unlock all fixtures, daily updates, and advanced goal market data.</p>
     <div class="cta-banner-btns">
-      <a href="https://paystack.shop/pay/fqlm48nc1i" class="cta-btn cta-primary">
-        <i class="fas fa-rocket"></i> Subscribe Now
-      </a>
-      <a href="https://wa.me/2349016501345" target="_blank" class="cta-btn cta-wa">
+      <a href="https://paystack.shop/pay/fqlm48nc1i" class="btn-primary">Sign Up</a>
+      <a href="https://wa.me/2349016501345" target="_blank" class="btn-outline">
         <i class="fab fa-whatsapp"></i> Ask a Question
       </a>
     </div>
@@ -423,97 +125,21 @@
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo">Safe<span>Goals</span></div>
-  <div class="footer-note">
-    Analytical tool only. No betting advice or outcome guarantees provided.<br>
-    © 2025 SafeGoals. All rights reserved.<br>
-    <span style="margin-top: 0.4rem; display:inline-block;">
-      <a href="/privacy.html" style="color:#555; text-decoration:none; transition: color 0.2s;" onmouseover="this.style.color='#00e87a'" onmouseout="this.style.color='#555'">Privacy Policy</a>
-      <span style="color:#333; margin: 0 0.4rem;">·</span>
-      <a href="/terms.html" style="color:#555; text-decoration:none; transition: color 0.2s;" onmouseover="this.style.color='#00e87a'" onmouseout="this.style.color='#555'">Terms of Service</a>
-    </span>
+  <div class="footer-top">
+    <div class="footer-logo">Safe<span>Goals</span></div>
+    <div class="footer-note">
+      Analytical tool only. No betting advice or outcome guarantees provided.<br>
+      © 2025 SafeGoals. All rights reserved.
+      <span class="footer-legal">
+        <a href="/privacy.html">Privacy Policy</a> · <a href="/terms.html">Terms of Service</a>
+      </span>
+    </div>
   </div>
+  <a href="https://wa.me/2349016501345" target="_blank" class="btn-outline">
+    <i class="fab fa-whatsapp"></i> Contact Us
+  </a>
 </footer>
 
-<script>
-  const SUPABASE_URL = "https://ccmsjcnuyrngqxwrswfe.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNjbXNqY251eXJuZ3F4d3Jzd2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE2MjU2MjgsImV4cCI6MjA2NzIwMTYyOH0.dkjCo2bgDMf923VKESkyMLsULo7IhmsYb6r-4Dn6SRY";
-
-  const { createClient } = window.supabase;
-  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  function teamRisk(gsp) {
-    if (gsp < 50)               return { text: "High Risk",   cls: "high"   };
-    if (gsp >= 55 && gsp <= 60) return { text: "Medium Risk", cls: "medium" };
-    if (gsp >= 61)              return { text: "Low Risk",    cls: "low"    };
-    return                             { text: "Unclear",     cls: ""       };
-  }
-
-  function combinedRisk(sum) {
-    if (sum >= 140) return { text: "Low Risk",    cls: "low"    };
-    if (sum >= 100) return { text: "Medium Risk", cls: "medium" };
-    return                 { text: "High Risk",   cls: "high"   };
-  }
-
-  function renderCard(f, i) {
-    const home = Number(f.home_gsp) || 0;
-    const away = Number(f.away_gsp) || 0;
-    const total = home + away;
-    const hRisk = teamRisk(home);
-    const aRisk = teamRisk(away);
-    const cRisk = combinedRisk(total);
-
-    return `
-      <div class="fixture-card" style="animation-delay:${i * 0.08}s">
-        <div class="fixture-teams">
-          ${f.home_name} <span class="vs">vs</span> ${f.away_name}
-        </div>
-        <div class="sub-label">Over 0.5 Goal – Per Team</div>
-        <div class="risk-row">
-          <span class="team-name">${f.home_name} (${home}%)</span>
-          <span class="risk-pill ${hRisk.cls}">${hRisk.text}</span>
-        </div>
-        <div class="risk-row">
-          <span class="team-name">${f.away_name} (${away}%)</span>
-          <span class="risk-pill ${aRisk.cls}">${aRisk.text}</span>
-        </div>
-        <hr class="card-divider"/>
-        <div class="sub-label">Over 1.5 Goals – Combined</div>
-        <div class="combined-row">
-          <span class="combined-label">Total GSP (${total}%)</span>
-          <span class="risk-pill ${cRisk.cls}">${cRisk.text}</span>
-        </div>
-      </div>
-    `;
-  }
-
-  async function loadSamples() {
-    const list = document.getElementById('fixture-list');
-
-    const { data, error } = await sb
-      .from('fixtures')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(5);
-
-    console.log('data:', data);
-    console.log('error:', error);
-
-    if (error) {
-      list.innerHTML = `<div class="empty-state" style="color:var(--high)">Error: ${error.message}</div>`;
-      return;
-    }
-
-    if (!data || data.length === 0) {
-      list.innerHTML = '<div class="empty-state">No fixtures in database yet.</div>';
-      return;
-    }
-
-    list.innerHTML = data.map((f, i) => renderCard(f, i)).join('');
-  }
-
-  window.addEventListener('DOMContentLoaded', loadSamples);
-</script>
-
+<script src="index.js"></script>
 </body>
 </html>
